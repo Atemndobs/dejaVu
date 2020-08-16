@@ -51,7 +51,7 @@
 
           <q-route-tab
             to="/camera"
-            icon="camera"
+            icon="eva-camera-outline"
           />
         </q-tabs>
     </q-footer>

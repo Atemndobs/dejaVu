@@ -74,7 +74,7 @@ export default {
           caption: 'Marche Nkouloulou',
           date: 1597579910750,
           location:'Mokolo, Cameroon',
-          imageUrl:'http://localhost:1337/uploads/pexels_yogendra_singh_3367460_2087dc8f76.jpeg'
+          imageUrl:'http://localhost:1337/uploads/pexels_yogendra_singh_3367460_35ac2105b8.jpeg'
          // imageUrl:'https://cdn.quasar.dev/img/parallax2.jpg'
         },
         {
