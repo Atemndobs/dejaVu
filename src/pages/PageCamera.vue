@@ -54,11 +54,14 @@
      <q-input
        label="Location"
        v-model="post.location"
+       :loading="locationLoading"
        class="col col-sm-6"
        dense
      >
       <template v-slot:append>
         <q-btn
+          v-if="!locationLoading && locationSupported"
+          @click="getLocation"
           dense
           flat
           icon="eva-navigation-2-outline"
@@ -98,7 +101,16 @@ export default {
         },
         imageCaptured : false,
         imageUpload: [],
-        hasCameraSupport: true
+        hasCameraSupport: true,
+        locationLoading: false
+
+      }
+    },
+
+    computed: {
+      locationSupported() {
+        if ('geolocation' in navigator) return true
+        return false
       }
     },
     methods: {
@@ -172,7 +184,44 @@ export default {
         var blob = new Blob([ab], {type: mimeString});
         return blob;
 
+      },
+
+      getLocation() {
+        this.locationLoading = true;
+        navigator.geolocation.getCurrentPosition(position => {
+          this.getCityAndCountry(position)
+        }, error => {
+           this.locationError();
+        }, {timeout: 7000})
+      },
+
+      getCityAndCountry(position) {
+        let apiUrl = `https://geocode.xyz/${position.coords.latitude},${position.coords.longitude}?json=1`;
+
+        this.$axios.get(apiUrl).then(result => {
+          this.locationSuccesss(result)
+        }).catch(error => {
+          this.locationError();
+        })
+      },
+
+      locationSuccesss(result) {
+
+        this.post.location = result.data.city;
+                if (result.data.country) {
+          this.post.location += `, ${result.data.country}`;
+        }
+        this.locationLoading = false
+      },
+
+      locationError() {
+        this.$q.dialog({
+          title: 'Error',
+          message: 'Could not find your Location'
+        })
+        this.locationLoading = false
       }
+
     },
     mounted() {
       this.initCamera();
