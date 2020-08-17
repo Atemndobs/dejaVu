@@ -1,5 +1,5 @@
 {
-  "name": "atm",
+  "name": "deja-vue",
   "version": "0.0.1",
   "description": "a progressive web app based on vue with a firebase / laravel backend",
   "productName": "Quasar App",
