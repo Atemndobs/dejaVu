@@ -62,7 +62,7 @@
   </q-page>
 </template>
 
-<script lang="ts">
+<script >
 import { date } from 'quasar'
 export default {
   name: 'Page',
