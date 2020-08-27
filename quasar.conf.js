@@ -110,7 +110,12 @@ module.exports = configure(function (/* ctx */) {
 
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [],
+    animations: [
+      'fadeIn',
+      'fadeOut',
+      'bounceInLeft',
+      'bounceOutRight'
+    ],
 
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
@@ -122,8 +127,8 @@ module.exports = configure(function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `Deja vu`,
-        short_name: `Deja vu`,
+        name: `DejaVue`,
+        short_name: `DejaVue`,
         description: `a progressive web app based on vue with a firebase / laravel backend`,
         display: 'standalone',
         orientation: 'portrait',

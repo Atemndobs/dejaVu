@@ -36,11 +36,62 @@
     </q-header>
 
     <q-footer
-      class="bg-white small-screen-only"
+      class="bg-white "
       bordered
       >
+
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
+        <div class="banner-container bg-primary" v-if="showAppInstallBanner">
+          <div class="constrain">
+            <q-banner
+              class="bg-primary text-white"
+              inline-actions
+              dense
+            >
+
+              <template v-slot:avatar>
+                <q-avatar
+                  color="white"
+                  icon="eva-camera-outline"
+                  text-color="grey-10"
+                  font-size="22ps"
+                />
+              </template>
+              <b> Install DejaVu? </b>
+
+              <template v-slot:action>
+                <q-btn
+                  @click="installApp"
+                  class="q-px-sm"
+                  dense
+                  flat
+                  label="YES"
+                />
+                <q-btn
+                  @click="showAppInstallBanner = false"
+                  class="q-px-sm"
+                  dense
+                  flat
+                  label="LATER"
+                />
+                <q-btn
+                  @click="neverShowAppInstall"
+                  class="q-px-sm"
+                  dense
+                  flat
+                  label="NEVER"
+                />
+              </template>
+            </q-banner>
+          </div>
+        </div>
+      </transition>
         <q-tabs
-          class="text-grey-10"
+          class="text-grey-10 small-screen-only"
           active-color="primary"
           indicator-color="transparent"
           >
@@ -62,14 +113,55 @@
   </q-layout>
 </template>
 
-<script lang="ts">
-
+<script >
+let deferredPrompt;
 
 export default {
   name: 'MainLayout',
   data() {
     return {
+      showAppInstallBanner: false,
 
+    }
+  },
+  mounted() {
+
+    let neverShowAppInstall = this.$q.localStorage.getItem('neverShowAppInstall')
+
+    if (!neverShowAppInstall) {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI notify the user they can install the PWA
+        setTimeout(() => {
+
+        }, 3000)
+        this.showAppInstallBanner = true
+      });
+    }
+  },
+  methods: {
+    installApp() {
+      // Hide the app provided install promotion
+      this.showAppInstallBanner = false;
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          this.neverShowAppInstall()
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      });
+    },
+    neverShowAppInstall(){
+      this.showAppInstallBanner = false
+
+      this.$q.localStorage.set('neverShowAppInstall', true)
     }
   }
 };

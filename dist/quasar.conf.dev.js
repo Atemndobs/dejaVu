@@ -91,7 +91,7 @@ module.exports = configure(function ()
     },
     // animations: 'all', // --- includes all animations
     // https://quasar.dev/options/animations
-    animations: [],
+    animations: ['fadeIn', 'fadeOut', 'bounceInLeft', 'bounceOutRight'],
     // https://quasar.dev/quasar-cli/developing-ssr/configuring-ssr
     ssr: {
       pwa: false
@@ -103,8 +103,8 @@ module.exports = configure(function ()
       workboxOptions: {},
       // only for GenerateSW
       manifest: {
-        name: "Deja vu",
-        short_name: "Deja vu",
+        name: "DejaVue",
+        short_name: "DejaVue",
         description: "a progressive web app based on vue with a firebase / laravel backend",
         display: 'standalone',
         orientation: 'portrait',
