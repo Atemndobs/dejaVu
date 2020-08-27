@@ -122,8 +122,8 @@ module.exports = configure(function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: `Quasar App`,
-        short_name: `Quasar App`,
+        name: `Deja vu`,
+        short_name: `Deja vu`,
         description: `a progressive web app based on vue with a firebase / laravel backend`,
         display: 'standalone',
         orientation: 'portrait',
