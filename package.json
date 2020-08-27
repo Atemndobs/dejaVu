@@ -2,7 +2,7 @@
   "name": "deja-vue",
   "version": "0.0.1",
   "description": "a progressive web app based on vue with a firebase / laravel backend",
-  "productName": "Quasar App",
+  "productName": "Deja vu",
   "author": "@Atemndobs <atemndobs@yahoo.com>",
   "private": true,
   "scripts": {
@@ -18,7 +18,8 @@
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
-    "@types/node": "^10.17.15"
+    "@types/node": "^10.17.15",
+    "workbox-webpack-plugin": "^5.1.3"
   },
   "browserslist": [
     "ie >= 11",
