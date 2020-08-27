@@ -6,7 +6,7 @@
   "author": "@Atemndobs <atemndobs@yahoo.com>",
   "private": true,
   "scripts": {
-    "test": "echo \"No test specified\" && exit 0"
+    "icons": "icongenie generate  -i atem-logo.png --skip-trim --theme-color"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
