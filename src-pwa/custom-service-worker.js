@@ -4,12 +4,11 @@
  * quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
  */
 
-
  /**
   * dependencies
   */
 
- import {precacheAndRoute} from 'workbox-precaching';
+  import {precacheAndRoute} from 'workbox-precaching';
 
 
  /**
