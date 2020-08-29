@@ -7,8 +7,9 @@
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
-let API_LOCAL = 'http://localhost:3000'
-let API_PROD = 'https://deja-vue-backend.herokuapp.com'
+var API_PROD = 'https://deja-vue-backend.herokuapp.com';
+var API_LOCAL = 'http://localhost:3000';
+var API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com' ;
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -48,10 +49,9 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-         API: API_LOCAL
-       //  API: API_PROD
-         // ? 'https://dev.' + process.env.MY_API
-         // : 'https://prod.' + process.env.MY_API
+        API: API_PROD
+         // ? 'https://dev.' + process.env.API_LOCAL
+         // : 'https://prod.' + process.env.API_PROD
       },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 

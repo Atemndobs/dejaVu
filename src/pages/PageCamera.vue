@@ -146,9 +146,7 @@ export default {
         this.imageCaptured = true
         this.showCamera = false
         this.post.photo = this.dataURItoBlob(canvas.toDataURL())
-        if (this.getLocation() !== "") {
-          this.getLocation()
-        }
+
         this.disableCamera()
       },
 
