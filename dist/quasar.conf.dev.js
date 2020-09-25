@@ -11,9 +11,9 @@
 var _require = require('quasar/wrappers'),
     configure = _require.configure;
 
-var API_PROD = 'https://deja-vue-backend.herokuapp.com';
-var API_LOCAL = 'http://localhost:3000';
-var API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com';
+var API_PROD = 'https://deja-vue-backend.herokuapp.com',
+    API_LOCAL = 'http://localhost:3000',
+    API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com';
 module.exports = configure(function ()
 /* ctx */
 {
@@ -25,7 +25,8 @@ module.exports = configure(function ()
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
-    boot: ['composition-api', 'axios'],
+    boot: [//'composition-api',
+    'axios'],
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
     css: ['app.sass'],
     // https://github.com/quasarframework/quasar/tree/dev/extras
@@ -41,7 +42,7 @@ module.exports = configure(function ()
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API: API_PROD // ? 'https://dev.' + process.env.API_LOCAL
+        API: API_LOCAL // ? 'https://dev.' + process.env.API_LOCAL
         // : 'https://prod.' + process.env.API_PROD
 
       },

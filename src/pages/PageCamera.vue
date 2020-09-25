@@ -83,7 +83,7 @@
 
     <div class="row justify-center q-mt-lg">
       <q-btn
-        @click="addPost()"
+        @click="sendPost()"
         :disable="!post.caption || !post.photo"
         color="primary"
         label="Post Image"
@@ -109,7 +109,9 @@ export default {
           caption: '',
           location: '',
           photo: null,
-          date: Date.now()
+          date: Date.now(),
+          imageId:'',
+          imageUrl: ''
         },
         imageCaptured : false,
         imageUpload: [],
@@ -124,6 +126,11 @@ export default {
       locationSupported() {
         if ('geolocation' in navigator) return true
         return false
+      },
+      backgroundSyncSupported(){
+        // check if browser supports service worker
+        if ('serviceWorker' in navigator && 'SyncManager' in window) return true
+        return false
       }
     },
     methods: {
@@ -136,17 +143,18 @@ export default {
           this.hasCameraSupport = false;
         })
         },
-      captureImage() {
+
+      captureImage(){
         let video = this.$refs.video;
         let canvas = this.$refs.canvas;
         canvas.width = video.getBoundingClientRect().width;
         canvas.height = video.getBoundingClientRect().height;
         let context = canvas.getContext('2d');
         context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
         this.imageCaptured = true
         this.showCamera = false
         this.post.photo = this.dataURItoBlob(canvas.toDataURL())
-
         this.disableCamera()
       },
 
@@ -173,6 +181,7 @@ export default {
         }
         reader.readAsDataURL(file);
         this.imageCaptured = true;
+
       },
 
       disableCamera() {
@@ -241,7 +250,6 @@ export default {
         this.locationLoading = false
       },
       addPost() {
-
       this.$q.loading.show();
        let formData = new FormData();
        formData.append('id', this.post.id)
@@ -251,7 +259,7 @@ export default {
        formData.append('file', this.post.photo, this.post.id + '.png')
 
        this.$axios.post(`${process.env.API}/createPost`, formData).then(response => {
-         console.log(response);
+         //console.log(response);
          this.$router.push('/')
 
         this.$q.notify({
@@ -265,15 +273,115 @@ export default {
         })
         this.$q.loading.hide();
        }).catch(error => {
-         console.log(error);
-        this.$q.dialog({
-          title: 'Error',
-          message: 'Sorry Could not create post'
+        // console.log(error);
+       //  console.log(navigator.onLine, this.backgroundSyncSupported)
+         if (!navigator.onLine && this.backgroundSyncSupported){
+           // redirrect to home page
+           this.$q.notify('Post Created offline')
+           this.$router.push('/');
+         }
+         else {
+           this.$q.dialog({
+             title: 'Error',
+             message: 'Sorry Could not create post'
+           })
+         }
 
-        })
         this.$q.loading.hide()
        })
-      }
+      },
+      sendPost(){
+      this.$q.loading.show();
+        this.createImage()
+
+      },
+      createImage(){
+
+        let formData = new FormData();
+       // formData.append('file', this.post.photo, this.post.id + '.png')
+        formData.append('files', this.post.photo, this.post.id + '.png')
+        this.$axios.post(`${process.env.API}/upload`, formData).then(response => {
+          this.imageId = response.data[0].id;
+          this.getImage(this.imageId)
+
+        }).catch(error => {
+          // console.log(error);
+          //  console.log(navigator.onLine, this.backgroundSyncSupported)
+          if (!navigator.onLine && this.backgroundSyncSupported){
+            // redirrect to home page
+            this.$q.loading.hide();
+            this.$q.notify('Post Created offline')
+            this.$router.push('/');
+          }
+          else {
+            this.$q.loading.hide();
+            this.$q.dialog({
+              title: 'Error',
+              message: 'Sorry Could not create post'
+            })
+          }
+        })
+      },
+      getImage(id){
+        this.$axios.get(`${process.env.API}/upload/files/${id}`).then(response => {
+          let data = {
+            'caption': this.post.caption,
+            'location': this.post.location,
+            'imageUrl': process.env.API + response.data.url
+          }
+          this.submitPost(data)
+
+        }).catch(error => {
+          if (!navigator.onLine && this.backgroundSyncSupported){
+            // redirrect to home page
+            this.$q.loading.hide();
+            this.$q.notify('Post Created offline')
+            this.$router.push('/');
+          }
+          else {
+            this.$q.loading.hide();
+            this.$q.dialog({
+              title: 'Error',
+              message: 'Sorry Could not create post'
+            })
+          }
+        })
+      },
+      submitPost(data){
+
+                this.$axios.post(`${process.env.API}/posts`, data).then(response => {
+
+                  this.$router.push('/')
+
+                  this.$q.notify({
+                    message: 'Post Created',
+                    color: 'positive',
+                    // avatar: '../statics/avat_atem.png',
+                    avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
+                    actions: [
+                      { label: 'Dismis', color: 'white' }
+                    ]
+                  })
+                  this.$q.loading.hide();
+                }).catch(error => {
+                  // console.log(error);
+                  //  console.log(navigator.onLine, this.backgroundSyncSupported)
+                  if (!navigator.onLine && this.backgroundSyncSupported){
+                    // redirrect to home page
+                    this.$q.notify('Post Created offline')
+                    this.$router.push('/');
+                  }
+                  else {
+                    this.$q.dialog({
+                      title: 'Error',
+                      message: 'Sorry Could not create post'
+                    })
+                  }
+
+                  this.$q.loading.hide()
+                })
+
+      },
 
     },
     mounted() {

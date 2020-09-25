@@ -111,13 +111,13 @@ export default {
   methods: {
     getPosts() {
 
-    //  console.log(`${process.env.API}/posts`);
+      console.log(`${process.env.API}/posts`);
 
       this.loadingPosts = true;
       this.$axios.get(`${process.env.API}/posts`).then(response => {
 
             this.posts= response.data
-            console.log(response);
+           // console.log(response);
             this.loadingPosts = false;
       })
       .catch(error => {

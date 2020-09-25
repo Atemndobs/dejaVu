@@ -7,9 +7,9 @@
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
-var API_PROD = 'https://deja-vue-backend.herokuapp.com';
-var API_LOCAL = 'http://localhost:3000';
-var API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com' ;
+let API_PROD = 'https://deja-vue-api.herokuapp.com',
+API_LOCAL = 'http://localhost:1337',
+API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com'
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -23,7 +23,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://quasar.dev/quasar-cli/boot-files
     boot: [
-      'composition-api',
+      //'composition-api',
       'axios',
     ],
 

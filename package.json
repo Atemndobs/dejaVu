@@ -6,7 +6,8 @@
   "author": "@Atemndobs <atemndobs@yahoo.com>",
   "private": true,
   "scripts": {
-    "icons": "icongenie generate  -i atem-logo.png --skip-trim --theme-color"
+    "icons": "icongenie generate  -i atem-logo.png --skip-trim --theme-color",
+    "deploy": "quasar build -m pwa && firebase deploy"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

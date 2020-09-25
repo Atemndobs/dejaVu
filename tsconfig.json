@@ -3,5 +3,13 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "es5",
-  }
+    "noEmit": false
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
+  ]
 }
