@@ -116,7 +116,7 @@ export default {
       this.loadingPosts = true;
       this.$axios.get(`${process.env.API}/posts`).then(response => {
 
-            this.posts= response.data
+            this.posts= response.data.reverse()
            // console.log(response);
             this.loadingPosts = false;
       })

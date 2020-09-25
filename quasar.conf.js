@@ -129,7 +129,7 @@ module.exports = configure(function (/* ctx */) {
       manifest: {
         name: `DejaVue`,
         short_name: `DejaVue`,
-        description: `a progressive web app based on vue with a firebase / laravel backend`,
+        description: `a progressive web app based on vue with a firebase / laravel backend / Strap.io for backend`,
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
