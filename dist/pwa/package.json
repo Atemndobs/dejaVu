@@ -1,0 +1,10 @@
+{
+  "name": "deja-vue",
+  "version": "1.0.0",
+  "description": "deja-vue",
+  "author": "Atem Ndobs",
+  "private": true,
+  "scripts": {
+    "postinstall": "npm install express"
+  }
+}
