@@ -50,7 +50,7 @@ sql:
 env:
 	cp .env.prod .env
 pull:
-	git pull
+	git reset --hard && git pull
 
 build:
 	quasar build -m pwa
