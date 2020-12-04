@@ -54,7 +54,7 @@ module.exports = configure(function (/* ctx */) {
          // ? 'https://dev.' + process.env.API_LOCAL
          // : 'https://prod.' + process.env.API_PROD
       },
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history', // available values: 'hash', 'history'
 
       // transpile: false,
 
