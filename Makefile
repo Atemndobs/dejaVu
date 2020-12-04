@@ -63,17 +63,17 @@ nu-deja:
 	cp /var/www/deja-vue/dist/pwa dejavu
 
 re-pix:
-	rm -rf /var/www/dejavu
+	rm -rf /var/www/pixelate
 nu-pix:
-	cp /var/www/deja-vue/dist/pwa pixelate
+	cp /var/www/pixelate_app/dist/pwa pixelate
 
 deja:
-	make re-deja && make nudeja
+	make re-deja && make nu-deja
 pix:
 	make re-pix && make nu-pix
 
 all:
-	make deja && nake pix
+	make deja && make pix
 
 
 
