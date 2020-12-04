@@ -57,13 +57,14 @@ sql:
 env:
 	cp .env.prod .env
 pull:
-	git pull && make env
+	git pull
+
 build:
 	quasar build -m pwa
 run:
 	quasar dev -m pwa
 up:
-	make pull && make install && make qu
+	make pull
 
 re-deja:
 	rm -rf /var/www/dejavu
