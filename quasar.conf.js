@@ -7,10 +7,8 @@
 // https://quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
-let API_PROD = 'https://deja-vue-api.herokuapp.com',
-API_LOCAL = 'http://localhost:8000/api',
-// API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com'
- API_PRODUCTION = 'https://atemkeng.com/api'
+
+API_PRODUCTION = 'https://atemkeng.com/api'
 
 module.exports = configure(function (/* ctx */) {
   return {
