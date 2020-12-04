@@ -68,12 +68,9 @@ nu-pix:
 	cp -r /var/www/pixelate_app/dist/pwa pixelate
 
 deja:
-	make re-deja && make nu-deja
+	make pull && make re-deja && make nu-deja
 pix:
-	make re-pix && make nu-pix
-
-all:
-	make deja && make pix
+	make pull && make re-pix && make nu-pix
 
 
 
