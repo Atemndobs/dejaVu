@@ -12,9 +12,6 @@ ifeq ($(os_type),Darwin)
 endif
 
 
-
-
-
 serve:
 	php artisan serve
 
@@ -42,10 +39,6 @@ cron:
 analyse:
 	php vendor/bin/phpstan.phar analyse --level=6 src
 
-qu:
-	php artisan queue:work &
-horizon:
-	php artisan horizon
 restart-php-pfm:
 	sudo service phpX.Y-fpm-sp restart
 install:
@@ -63,8 +56,6 @@ build:
 	quasar build -m pwa
 run:
 	quasar dev -m pwa
-up:
-	make pull
 
 re-deja:
 	rm -rf /var/www/dejavu
@@ -83,3 +74,14 @@ pix:
 
 all:
 	make deja && nake pix
+
+
+
+ifeq ($(shell pwd),/var/www/deja-vue)
+up:
+	make pull && make deja
+endif
+ifeq ($(shell pwd),/var/www/pixelate)
+up:
+	make pull && make pix
+endif
