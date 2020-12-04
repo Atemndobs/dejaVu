@@ -9,7 +9,8 @@
 const { configure } = require('quasar/wrappers');
 let API_PROD = 'https://deja-vue-api.herokuapp.com',
 API_LOCAL = 'http://localhost:8000/api',
-API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com'
+// API_PRODUCTION = 'https://deja-vue-backend.herokuapp.com'
+ API_PRODUCTION = 'https://atemkeng.com'
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -49,7 +50,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API: API_LOCAL
+        API: API_PRODUCTION
          // ? 'https://dev.' + process.env.API_LOCAL
          // : 'https://prod.' + process.env.API_PROD
       },
