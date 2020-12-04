@@ -30,13 +30,13 @@
                 <q-separator />
 
                 <q-img :src="post.imageUrl"/>
+      <!--        <img src="http://localhost:8000/storage/JPRFgcCF31wg8tii8Q45JpQ4lnanOENpfM2t73Oc.png" />-->
                 <q-card-section>
                   <div >{{post.caption}}</div>
-                  <div class="text-caption text-grey">{{post.date | niceDate}}</div>
+                  <div class="text-caption text-grey">{{post.created_at | niceDate}}</div>
                 </q-card-section>
             </q-card>
           </template>
-
           <template v-else-if="!loadingPosts && !posts.length">
             <h5 class="text-center text-grey">
               No POSTS HERE
@@ -111,13 +111,12 @@ export default {
   methods: {
     getPosts() {
 
-      console.log(`${process.env.API}/posts`);
+    //  console.log(`${process.env.API}/posts`);
 
       this.loadingPosts = true;
       this.$axios.get(`${process.env.API}/posts`).then(response => {
-
-            this.posts= response.data.reverse()
-           // console.log(response);
+        console.log(response.data.data)
+            this.posts= response.data.data.reverse()
             this.loadingPosts = false;
       })
       .catch(error => {

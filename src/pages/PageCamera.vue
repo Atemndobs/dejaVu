@@ -106,12 +106,13 @@ export default {
       return {
         post: {
           id:uid(),
-          caption: '',
-          location: '',
+          caption: 'Around the world',
+          location: 'Somewhere on Earth',
           photo: null,
           date: Date.now(),
           imageId:'',
-          imageUrl: ''
+          imageUrl: '',
+          userId:''
         },
         imageCaptured : false,
         imageUpload: [],
@@ -255,7 +256,6 @@ export default {
        formData.append('id', this.post.id)
        formData.append('caption', this.post.caption)
        formData.append('location', this.post.location)
-       formData.append('date', this.post.date)
        formData.append('file', this.post.photo, this.post.id + '.png')
 
        this.$axios.post(`${process.env.API}/createPost`, formData).then(response => {
@@ -298,11 +298,20 @@ export default {
       createImage(){
 
         let formData = new FormData();
-       // formData.append('file', this.post.photo, this.post.id + '.png')
-        formData.append('files', this.post.photo, this.post.id + '.png')
-        this.$axios.post(`${process.env.API}/upload`, formData).then(response => {
-          this.imageId = response.data[0].id;
-          this.getImage(this.imageId)
+
+        formData.append('image', this.post.photo, this.post.id + '.png')
+
+        this.$axios.post(`${process.env.API}/designs`, formData).then(response => {
+         // console.log(response.data)
+          this.user_id = response.data.user_id
+          this.imageId = response.data.id;
+
+          let formData = new FormData();
+          formData.append('caption', this.post.caption)
+          formData.append('location', this.post.location)
+          formData.append('image', this.post.photo, this.post.id + '.png')
+
+          this.submitPost(formData)
 
         }).catch(error => {
           // console.log(error);
@@ -323,13 +332,16 @@ export default {
         })
       },
       getImage(id){
-        this.$axios.get(`${process.env.API}/upload/files/${id}`).then(response => {
+        this.$axios.get(`${process.env.API}/image/${id}`).then(response => {
+        //  console.log('POST TO IMAGE END POINT :: '+ response.data)
+          const url  = response.data.image
           let data = {
             'caption': this.post.caption,
             'location': this.post.location,
-            'imageUrl': process.env.API + response.data.url
+            'imageUrl': url
           }
-          this.submitPost(data)
+
+        //  this.submitPost(data)
 
         }).catch(error => {
           if (!navigator.onLine && this.backgroundSyncSupported){
@@ -349,7 +361,10 @@ export default {
       },
       submitPost(data){
 
-                this.$axios.post(`${process.env.API}/posts`, data).then(response => {
+                this.$axios.post(`${process.env.API}/posts/${this.user_id}`, data).then(response => {
+
+                  console.log('SUBMITTED POST :: => ')
+                  console.log(response)
 
                   this.$router.push('/')
 
