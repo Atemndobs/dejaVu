@@ -60,12 +60,12 @@ run:
 re-deja:
 	rm -rf /var/www/dejavu
 nu-deja:
-	cp /var/www/deja-vue/dist/pwa dejavu
+	cp -r /var/www/deja-vue/dist/pwa dejavu
 
 re-pix:
 	rm -rf /var/www/pixelate
 nu-pix:
-	cp /var/www/pixelate_app/dist/pwa pixelate
+	cp -r /var/www/pixelate_app/dist/pwa pixelate
 
 deja:
 	make re-deja && make nu-deja
