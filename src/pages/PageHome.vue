@@ -20,7 +20,7 @@
 
                   <q-item-section>
                     <q-item-label
-                    class="text-bold">atem__ndobs</q-item-label>
+                    class="text-bold"></q-item-label>
                     <q-item-label caption>
                       {{post.location}}
                     </q-item-label>
@@ -82,13 +82,36 @@
                 <q-item-label
                 class="text-bold">atem__ndobs</q-item-label>
                 <q-item-label caption>
-                  Atemkeng
+                   {{this.$auth.user()?this.$auth.user().name:'Atemkeng'}}
                 </q-item-label>
               </q-item-section>
             </q-item>
 
         </div>
       </div>
+    <q-page-sticky :offset="[18, 18]">
+      <q-btn
+        class="q-mr-sm"
+        to="/login"
+        icon="login"
+        round
+        text-color="black"
+        size="18px"
+        densef
+        color="primary"
+      />
+
+      <q-btn
+        class="q-mr-sm"
+        to="/account/home"
+        icon="person"
+        round
+        text-color="black"
+        size="18px"
+        densef
+        color="primary"
+      />
+    </q-page-sticky>
   </q-page>
 </template>
 

@@ -1,1 +1,15 @@
-{}
+{
+  "vuelidate-rules": {},
+  "http-authentication": {
+    "baseUrl": "http://atemkeng.com/api",
+    "authenticationScheme": "Bearer",
+    "identifierField": "email",
+    "registerRoute": "/register",
+    "verificationRoute": "/verification/verify",
+    "resendVerificationRoute": "verification/resend",
+    "loginRoute": "/login",
+    "passwordForgotRoute": "/password/forgot",
+    "passwordResetRoute": "/password/reset",
+    "fetchUserRoute": "/me"
+  }
+}

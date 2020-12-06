@@ -11,18 +11,25 @@
     "deploy-heroku": "quasar build -m pwa && git subtree push --prefix dist/pwa heroku master"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.9.10",
     "@vue/composition-api": "^0.6.4",
+    "@websanova/vue-auth": "^3.3.3",
     "axios": "^0.18.1",
-    "core-js": "^3.6.5",
+    "core-js": "^3.8.0",
     "md-gum-polyfill": "^1.0.0",
-    "quasar": "^1.0.0",
-    "workbox-precaching": "^5.1.3"
+    "quasar": "^1.14.6",
+    "validator": "^12.1.0",
+    "vform": "^1.0.1",
+    "workbox-precaching": "^5.1.4"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.8",
-    "@types/node": "^10.17.15",
-    "workbox-webpack-plugin": "^5.1.3"
+    "@quasar/app": "^2.1.9",
+    "@types/node": "^10.17.48",
+    "components": "^0.1.0",
+    "http-authentication": "^1.1.5",
+    "quasar-app-extension-http-authentication": "^1.0.4",
+    "quasar-app-extension-vuelidate-rules": "^0.3.1",
+    "workbox-webpack-plugin": "^5.1.4"
   },
   "browserslist": [
     "ie >= 11",

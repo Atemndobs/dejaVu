@@ -32,6 +32,21 @@
           size="18px"
           dense
         />
+        <q-separator
+          class="large-screen-only"
+          vertical
+          spaced
+        />
+        <q-btn
+          class="large-screen-only q-mr-sm"
+          to="/login"
+          icon="login"
+          round
+          text-color="black"
+          size="18px"
+          dense
+        />
+
       </q-toolbar>
     </q-header>
 
