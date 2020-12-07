@@ -30,7 +30,6 @@
                 <q-separator />
 
                 <q-img :src="post.imageUrl"/>
-      <!--        <img src="http://localhost:8000/storage/JPRFgcCF31wg8tii8Q45JpQ4lnanOENpfM2t73Oc.png" />-->
                 <q-card-section>
                   <div >{{post.caption}}</div>
                   <div class="text-caption text-grey">{{post.created_at | niceDate}}</div>
