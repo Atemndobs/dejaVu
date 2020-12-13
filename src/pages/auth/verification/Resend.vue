@@ -61,8 +61,9 @@ export default {
     }
   },
   mounted () {
+    console.log(this.$auth.check())
     if (this.$auth.check()) {
-      this.$router.push('/account')
+      this.$router.push('/account/home')
     }
   },
   watch: {
@@ -86,6 +87,7 @@ export default {
       }
     },
     onSubmit () {
+      console.log(this.data)
       this.loading = true
       this.$auth
         .verificationResend(this.data)

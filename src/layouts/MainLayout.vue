@@ -37,16 +37,49 @@
           vertical
           spaced
         />
-        <q-btn
-          class="large-screen-only q-mr-sm"
-          to="/login"
-          icon="login"
-          round
-          text-color="black"
-          size="18px"
-          dense
-        />
+        <q-item
+          v-if="!this.$auth.check()"
+          class="large-screen-only"
+        >
+          <q-item-section >
+            <q-btn
+              class="q-mr-sm"
+              to="/login"
+              icon="login"
+              round
+              text-color="black"
+              size="18px"
+              dense
+            />
+          </q-item-section>
 
+        </q-item >
+        <q-item
+          v-else
+        >
+          <q-item-section  >
+            <q-btn
+              class="large-screen-only"
+              to="/account/home"
+              icon="person"
+              text-color="black"
+              size="18px"
+              rounded
+              dense
+            />
+          </q-item-section>
+          <q-item-section >
+            <q-btn
+              class="large-screen-only q-mr-sm"
+              to="/logout"
+              icon="power_settings_new"
+              round
+              text-color="black"
+              size="18px"
+              dense
+            />
+          </q-item-section>
+        </q-item>
       </q-toolbar>
     </q-header>
 
@@ -75,8 +108,12 @@
                   text-color="grey-10"
                   font-size="22ps"
                 />
+
+
               </template>
+
               <b> Install DejaVu? </b>
+
 
               <template v-slot:action>
                 <q-btn
@@ -125,7 +162,54 @@
     <q-page-container class="bg-grey-1">
       <router-view />
     </q-page-container>
+    <q-page-sticky
+      :offset="[18, 18]"
+    >
+      <q-item
+        v-if="!this.$auth.check()"
+      >
+        <q-item-section >
+          <q-btn
+            class="small-screen-only q-mr-sm"
+            to="/login"
+            icon="login"
+            round
+            text-color="black"
+            size="18px"
+            dense
+          />
+        </q-item-section>
+
+      </q-item >
+      <q-item
+        v-else
+      >
+        <q-item-section  >
+          <q-btn
+            class="small-screen-only q-mr-sm"
+            to="/account/home"
+            icon="person"
+            text-color="black"
+            size="18px"
+            rounded
+            dense
+          />
+        </q-item-section>
+        <q-item-section >
+          <q-btn
+            class="small-screen-only q-mr-sm"
+            to="/logout"
+            icon="power_settings_new"
+            round
+            text-color="black"
+            size="18px"
+            dense
+          />
+        </q-item-section>
+      </q-item>
+    </q-page-sticky>
   </q-layout>
+
 </template>
 
 <script >
