@@ -61,11 +61,11 @@
                           @click="submitLike(post)"
                           rounded
                           dense
-                          :label="post.likes.likes_count"
+                          :label="post.likes.likes_count === 0?'':post.likes.likes_count"
                         >
                           <q-icon
-                            :name="reactionType"
-                            :color="isLiked? 'red' : ''"
+                            :name="post.likes.icon_class"
+                            :color="post.likes.is_liked? 'red' : ''"
                             size="25px"
                             rounded
                           />
@@ -73,14 +73,14 @@
                         </q-btn>
                       </q-item>
 
-
+                      {{commentBox}}
                       <div class="row justify-center q-ma-md">
                         <q-input
-                          label="Comment*"
-                          v-model="post.comment"
+                          label="add comment"
+                          v-model="commentBox"
                           class="col col-sm-6"
                           dense
-                          @keydown.enter.prevent="addComment(post.comment, post)"
+                          @keydown.enter.prevent="addComment(commentBox, post)"
                         />
                       </div>
 
@@ -90,8 +90,8 @@
 
                   </q-item-section>
 
-
                   <q-list bordered class="rounded-borders">
+
                     <q-expansion-item
                       expand-separator
                       icon="eva-message-circle-outline"
@@ -183,7 +183,6 @@ export default {
   data() {
     return{
       posts: [],
-      comments: {},
       commentBox:'',
       loadingPosts: false,
       totalLikes: '',
@@ -195,18 +194,46 @@ export default {
   filters: {
     niceDate(value) {
       return  date.formatDate(value, 'MMMM D h:mmA')
+    },
+
+    reverse(items) {
+      return items.slice().reverse()
     }
   },
   methods: {
-    getPosts() {
 
+    getPosts() {
     //  console.log(`${process.env.API}/posts`);
 
       this.loadingPosts = true;
       this.$axios.get(`${process.env.API}/posts`).then(response => {
-       // console.log(response.data.data.likes)
             this.posts= response.data.data.reverse()
-            this.loadingPosts = false;
+
+        for (var i = 0; i < this.posts.length; i++) {
+            this.posts[i].comments = response.data.data[i].comments.reverse()
+
+          const reactions = response.data.data[i].reactions
+
+          var result = Object.keys(reactions).map(function(key) {
+            return  reactions[key];
+          });
+
+          let existing_reaction = result.find(
+            o => o.reacter_id === this.$auth.user().id
+            && o.reactant_id === response.data.data[i].id
+          );
+
+          if (existing_reaction){
+          //  console.log('EXISTING LIKE =======>' + existing_reaction);
+            this.posts[i].likes.icon_class = 'eva-heart'
+            this.posts[i].likes.is_liked = true
+          }
+
+        }
+
+        console.log( )
+
+        this.loadingPosts = false;
 
       })
       .catch(error => {
@@ -239,17 +266,24 @@ export default {
       }
 
       axios.post(apiUrl, data)
+
         .then(response => {
+          const position = this.posts.indexOf(post)
           const reaction_type = response.data.data.likes.reaction_type
           if (reaction_type === 'Like') {
-            this.reactionType = 'eva-heart'
-            this.isLiked = true
+            this.posts[position].likes.icon_class = 'eva-heart'
+            this.posts[position].likes.is_liked = true
           }else {
+            this.posts[position].likes.icon_class = 'eva-heart-outline'
+            this.posts[position].likes.is_liked = false
             this.reactionType = 'eva-heart-outline'
-            this.isLiked = false
-          }
 
-          console.log(response.data.data.likes.likes_count)
+          }
+          //const position = this.posts.indexOf(post)
+
+          this.posts[position].likes.likes_count = response.data.data.likes.likes_count
+
+          console.log(this.posts[position].likes.likes_count)
       }).catch(error => {
         console.log(error)
       })
@@ -274,21 +308,17 @@ export default {
         post:post,
       }
 
-      console.log('COMMENTATBL:=>    ' + post.id)
-      console.log('POST DATA:=>    ' + comment)
 
       axios.post(apiUrl, data)
         .then(response => {
-          const new_comment = response.data.data.new_comment
+          const position = this.posts.indexOf(post)
 
-          //this.comments.unshift(response.data);
+          this.posts[position].new_comment = response.data.data.new_comment
+          this.posts[position].comments_count = response.data.data.comments.length
+          this.posts[position].comments.unshift(response.data.data.new_comment)
 
+          this.commentBox = "";
 
-          this.comment = "";
-
-          console.log(this.comment)
-
-          console.log(response.data.data)
         }).catch(error => {
         console.log(error)
       })

@@ -215,6 +215,8 @@
 <script >
 let deferredPrompt;
 
+import Echo from 'laravel-echo'
+
 export default {
   name: 'MainLayout',
   data() {
@@ -224,6 +226,7 @@ export default {
     }
   },
   mounted() {
+
 
     let neverShowAppInstall = this.$q.localStorage.getItem('neverShowAppInstall')
 
@@ -240,6 +243,19 @@ export default {
         this.showAppInstallBanner = true
       });
     }
+
+
+
+    window.Pusher = require('pusher-js');
+
+    window.Echo = new Echo({
+      broadcaster: 'pusher',
+      key: 'c10b72782c8cc42e7404',
+      cluster : 'eu',
+      encrypted: true
+    });
+
+
   },
   methods: {
     installApp() {
