@@ -14,6 +14,7 @@
         class="q-gutter-md"
         @submit="onSubmit"
       >
+        {{data.users}}
         <q-card-section>
           <q-input
             v-if="identifierField === 'email'"
@@ -95,6 +96,7 @@
 import prompts from 'app/quasar.extensions.json'
 
 import isEmail from 'validator/es/lib/isEmail'
+import axios from "axios";
 
 export default {
   name: 'Login',
@@ -109,7 +111,8 @@ export default {
           email: 'bamarktfact@gmail.com',
           password: 'pass1234'
         },
-        rememberMe: false
+        rememberMe: false,
+        users:[]
       },
       loading: false,
       validations: {
@@ -202,7 +205,23 @@ export default {
         .finally(() => {
           this.loading = false
         })
+    },
+
+    getUsers(){
+      const apiUrl = process.env.API+"/users"
+      axios.get(apiUrl)
+        .then(response => {
+          Object.entries(response.data.data).forEach(([key, user]) => {
+            this.data.users.push(user.email)
+          });
+        }).catch(error => {
+        console.log(error)
+      })
     }
+  },
+
+  mounted() {
+    this.getUsers()
   }
 }
 </script>
