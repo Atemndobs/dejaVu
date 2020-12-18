@@ -360,8 +360,8 @@ export default {
       });
       let self = this
 
-      const channel = pusher.subscribe('comment-channel');
-      channel.bind('App\\Events\\CommentCreatedEvent',
+      const commentChannel = pusher.subscribe('comment-channel');
+      commentChannel.bind('App\\Events\\CommentCreatedEvent',
         function (data) {
          console.log('COMMING FROM PUSSHER ====================')
          JSON.stringify(data)
@@ -382,6 +382,31 @@ export default {
           });
         }
       )
+
+      const likeChannel = pusher.subscribe('like-channel');
+      likeChannel.bind('App\\Events\\LikeCreatedEvent',
+        function (data) {
+          JSON.stringify(data)
+
+          Object.entries(self.posts).forEach(([key, post]) => {
+
+            let sender = parseInt(data.post.reacter_id)
+            let user = parseInt(self.$auth.user().id)
+
+            if (post.id === data.post.id){
+              const position = self.posts.indexOf(post)
+              self.posts[position].likes.likes_count = data.post.likes.likes_count
+              // console.log('OLD LIKES :: ' +  self.posts[position].likes.likes_count)
+              // console.log('NEW COUNT ' +  data.post.likes.likes_count)
+            }
+
+            if (sender === user) {
+
+            }
+
+          });
+        }
+      );
     },
 
     pushEcho(){
@@ -455,8 +480,13 @@ export default {
 
   mounted() {
     if (!this.$auth.user()){
-    //  this.pusherData()
-      this.pushEcho()
+      this.pusherData()
+      if (process.env.API === 'http://localhost:8000/api'){
+      //  this.pushEcho()
+      }else {
+      //  this.pusherData()
+      }
+
     }
 
 

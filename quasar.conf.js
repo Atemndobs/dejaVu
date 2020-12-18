@@ -11,10 +11,10 @@ const { configure } = require('quasar/wrappers');
  API_LOCAL = 'http://localhost:8000/api'
 
 
-VUE_APP_WEBSOCKETS_ID="local"
-VUE_APP_WEBSOCKETS_KEY="local"
-VUE_APP_WEBSOCKETS_SERVER="http://127.0.0.1"
-VUE_APP_WEBSOCKETS_CLUSTER="eu"
+  VUE_APP_WEBSOCKETS_ID="local",
+  VUE_APP_WEBSOCKETS_KEY="local",
+  VUE_APP_WEBSOCKETS_SERVER="http://127.0.0.1",
+  VUE_APP_WEBSOCKETS_CLUSTER="eu",
 
 
 module.exports = configure(function (/* ctx */) {
@@ -58,6 +58,7 @@ module.exports = configure(function (/* ctx */) {
         API:API_LOCAL
          // ? 'https://dev.' + process.env.API_LOCAL
          // : 'https://prod.' + process.env.API_PROD
+
       },
       vueRouterMode: 'hash', // available values: 'hash', 'history'
 
