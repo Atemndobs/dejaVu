@@ -8,13 +8,16 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { configure } = require('quasar/wrappers');
  API_PRODUCTION = 'https://atemkeng.com/api'
- API_LOCAL = 'http://localhost:8000/api'
+ API_LOCAL = 'http://127.0.0.1:8000/api'
+ API_DOCKER = 'http://localhost/api'
+ API_VALET = 'https://pixelate.app/api'
 
+API_MUSIC = 'https://api.next-song.app/v1'
 
-  VUE_APP_WEBSOCKETS_ID="local",
-  VUE_APP_WEBSOCKETS_KEY="local",
-  VUE_APP_WEBSOCKETS_SERVER="http://127.0.0.1",
-  VUE_APP_WEBSOCKETS_CLUSTER="eu",
+  VUE_APP_WEBSOCKETS_ID="local"
+  VUE_APP_WEBSOCKETS_KEY="local"
+  VUE_APP_WEBSOCKETS_SERVER="http://127.0.0.1"
+  VUE_APP_WEBSOCKETS_CLUSTER="eu"
 
 
 module.exports = configure(function (/* ctx */) {
@@ -31,6 +34,7 @@ module.exports = configure(function (/* ctx */) {
     boot: [
       //'composition-api',
       'axios',
+      'capacitor'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -87,7 +91,17 @@ module.exports = configure(function (/* ctx */) {
     devServer: {
       https: false,
       port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically,
+      proxy: {
+        // proxy all requests starting with /api to jsonplaceholder
+        '/api': {
+          target: 'http://localhost:8080/',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/api': ''
+          }
+        }
+      }
     },
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
@@ -115,6 +129,8 @@ module.exports = configure(function (/* ctx */) {
       plugins: [
         'Dialog',
         'Notify',
+        'AppFullscreen',
+        'ion-icon'
       ]
     },
 

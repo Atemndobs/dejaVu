@@ -8,5 +8,9 @@ import { defineComponent } from '@vue/composition-api';
 
 export default defineComponent({
   name: 'App',
+  created() {
+    // get configured status
+   // this.$q.dark.set(false)
+  }
 });
 </script>

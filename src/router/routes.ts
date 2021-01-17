@@ -7,6 +7,16 @@ const routes: RouteConfig[] = [
     children: [
       { path: '', component: () => import('pages/PageHome.vue') },
       { path: '/camera', component: () => import('pages/PageCamera.vue') },
+      { path: '/photo', component: () => import('pages/PagePhoto.vue') },
+      { path: '/location', component: () => import('pages/PageLocation.vue') },
+      { path: '/battery', component: () => import('pages/PageBattery.vue') },
+      { path: '/settings', component: () => import('pages/PageSettings.vue') },
+      { path: '/pay', component: () => import('pages/payments/PagePayment.vue') },
+      { path: '/express', component: () => import('pages/payments/PageExpressPaypal.vue') },
+      { path: '/paypalclient', component: () => import('pages/payments/PagePaypalClient.vue') },
+
+
+      { path: '/audio', component: () => import('pages/PageAudio.vue') },
       { path: '/login', component: () => import('pages/auth/login.vue') },
       { path: '/logout', component: () => import('pages/auth/Logout.vue') },
       { path: '/register', component: () => import('pages/auth/register.vue') },

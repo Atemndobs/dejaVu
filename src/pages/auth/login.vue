@@ -27,14 +27,6 @@
             autofocus
           />
           <q-input
-            v-if="identifierField === 'username'"
-            v-model.trim="data.body.username"
-            type="text"
-            :label="lang.auth.fields.username"
-            :rules="validations['username']"
-            lazy-rules
-          />
-          <q-input
             id="password"
             v-model="data.body.password"
             :type="showPassword ? 'text' : 'password'"
@@ -109,7 +101,7 @@ export default {
       data: {
         body: {
           email: 'bamarktfact@gmail.com',
-          password: 'pass1234'
+          password: 'admin',
         },
         rememberMe: false,
         users:[]
@@ -152,9 +144,26 @@ export default {
 
     onSubmit () {
       this.loading = true
+
+
+
+      if (process.env.API === 'https://api.next-song.app/v1'){
+        this.data = {
+          body: {
+            password: 'admin',
+            username: 'admin@admin.com',
+            client_id: 2,
+            client_secret: 'D785jpw8ZgZCdIwy4NQ328lZHK0D0yZVzqRWz8jl',
+            grant_type: 'password',
+            scope: '',
+          },
+        }
+      }
+
       this.$auth
         .login(this.data)
         .then(response => {
+          response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
           this.$auth.fetch()
           this.$router.replace('/')
           this.$store.dispatch('auth/loginCallback')
@@ -211,6 +220,7 @@ export default {
       const apiUrl = process.env.API+"/users"
       axios.get(apiUrl)
         .then(response => {
+          console.log(response)
           Object.entries(response.data.data).forEach(([key, user]) => {
             this.data.users.push(user.email)
           });

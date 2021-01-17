@@ -292,26 +292,26 @@ export default {
       },
       sendPost(){
       this.$q.loading.show();
-        this.createImage()
-
+        let formData = new FormData();
+        formData.append('image', this.post.photo, this.post.id + '.png')
+        formData.append('caption', this.post.caption)
+        formData.append('location', this.post.location)
+        this.submitPost(formData)
       },
       createImage(){
 
         let formData = new FormData();
-
         formData.append('image', this.post.photo, this.post.id + '.png')
+        formData.append('caption', this.post.caption)
+        formData.append('location', this.post.location)
 
-        this.$axios.post(`${process.env.API}/designs`, formData).then(response => {
+
+        this.$axios.post(`${process.env.API}/designs`, formData)
+          .then(response => {
          // console.log(response.data)
           this.user_id = response.data.user_id
           this.imageId = response.data.id;
 
-          let formData = new FormData();
-          formData.append('caption', this.post.caption)
-          formData.append('location', this.post.location)
-          formData.append('image', this.post.photo, this.post.id + '.png')
-
-          this.submitPost(formData)
 
         }).catch(error => {
           // console.log(error);
@@ -360,12 +360,24 @@ export default {
         })
       },
       submitPost(data){
+        if (!this.$auth.check()){
+          this.$q.loading.hide()
+          this.$q.dialog({ 'message' : "You need to Login Before you can create post" })
+          this.$router.push('/login')
+          console.log({
+            'Error' : 'You need to log in to react to a post'
+          })
+          return
+        }
 
-                this.$axios.post(`${process.env.API}/posts/${this.user_id}`, data).then(response => {
+        let userId = this.$auth.user().id
+        // for submitting post as design Use snippet below
+       // this.$axios.post(`${process.env.API}/posts/${this.user_id}`, data)
+                this.$axios.post(`${process.env.API}/posts/${userId}`, data)
+                  .then(response => {
 
                   console.log('SUBMITTED POST :: => ')
-                  console.log(response)
-
+                 // console.log(response)
                   this.$router.push('/')
 
                   this.$q.notify({
@@ -392,7 +404,6 @@ export default {
                       message: 'Sorry Could not create post'
                     })
                   }
-
                   this.$q.loading.hide()
                 })
 
