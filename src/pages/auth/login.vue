@@ -101,7 +101,7 @@ export default {
       data: {
         body: {
           email: 'bamarktfact@gmail.com',
-          password: 'admin',
+          password: 'pass1234',
         },
         rememberMe: false,
         users:[]

@@ -485,7 +485,6 @@ export default {
 
 
 
-
         if (this.$auth.check()){
           for (let i = 0; i < this.posts.length; i++) {
 

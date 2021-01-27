@@ -1,6 +1,7 @@
 <template>
   <!-- Set up a container element for the button -->
   <div class="q-pa-xl">
+
     <q-btn color="teal" size="sm" label=" PayPal Smart Payment Buttons Integration | Server Demo ">
     </q-btn>
     <div class="q-pa-sm row items-start q-gutter-sm">
@@ -20,7 +21,6 @@
       </q-card>
     </div>
     <div class="q-gutter-y-md" style="max-width: 600px" >
-
       <div id="paypal-button-container"></div>
     </div>
   </div>
@@ -75,6 +75,8 @@ name: "PageExpressPaypal",
       },*/
 
       createOrder: function() {
+
+        console.log('AFSDFSFASFDSf')
         return fetch('http://127.0.0.1:8000/api/payment/create-order', {
           method: 'post',
           headers: {
@@ -119,6 +121,8 @@ name: "PageExpressPaypal",
         }*/
 
         const shippingAmount = data.shipping_address.country_code === 'DE' ? '5.00' : '5.00';
+
+        console.log(data.shipping_address)
         return actions.order.patch([
           {
             op: 'replace',
