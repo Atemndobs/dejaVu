@@ -21,11 +21,11 @@
           spaced
         />
         <q-toolbar-title
-          class="text-grand-hotel text-capitalise text-bold"
+          class="text-grand-hotel text-capitalise text-bold "
         >
           DejaVu
         </q-toolbar-title>
-        <q-fab
+<!--        <q-fab
           icon="menu"
           direction="left"
           text-color="black"
@@ -43,7 +43,8 @@
                         padding="xs"
                         flat
           />
-          <q-fab-action external-label label-position="left"
+
+&lt;!&ndash;          <q-fab-action external-label label-position="left"
                         to="/battery"
                         icon="eva-battery"
                         text-color="black"
@@ -97,9 +98,10 @@
                         label=""
                         padding="xs"
                         flat
-          />
-        </q-fab>
-        <q-btn
+          />&ndash;&gt;
+        </q-fab>-->
+
+<!--        <q-btn
           class="q-mr-sm"
           to="/pay"
           icon="eva-shopping-bag-outline"
@@ -107,14 +109,14 @@
           text-color="black"
           size="18px"
           dense
-        />
+          flat
+        />-->
         <q-btn
-          class="q-mr-sm"
-          to="/express"
-          icon="eva-unlock-outline"
+          to="/audio"
+          icon="eva-headphones-outline"
           round
           text-color="black"
-          size="18px"
+          size="13px"
           dense
         />
         <q-separator
@@ -122,19 +124,6 @@
           vertical
           spaced
         />
-<!--        <q-page-sticky position="top-right" :offset="fabPos">
-          <q-fab
-            icon="mdi-account-key"
-            direction="left"
-            padding="xs"
-
-            :disable="draggingFab"
-            v-touch-pan.prevent.mouse="moveFab"
-          >
-            <q-fab-action  icon="eva-heart" :disable="draggingFab" padding="xs" />
-            <q-fab-action  icon="thumb_up" :disable="draggingFab" padding="xs" />
-          </q-fab>
-        </q-page-sticky>-->
         <q-btn
           class="large-screen-only"
           to="/"
@@ -193,9 +182,11 @@
             />
           </q-item-section>
         </q-item>
-        <q-item>
-          <!-------- Dark mode activations------------->
-          <!--------    :icon="$q.dark.isActive ? 'eva-settings' : 'eva-settings-outline'"  ------------>
+
+        <!-- DArk Mod is not working Properly -->
+<!--        <q-item>
+          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45; Dark mode activations-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
+          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;    :icon="$q.dark.isActive ? 'eva-settings' : 'eva-settings-outline'"  &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
           <q-item-section>
             <q-btn
 
@@ -213,9 +204,9 @@
               spaced
             />
           </q-item-section>
-<!--          <q-toggle :value="$q.dark.isActive" @click="$q.dark.toggle()" />-->
-          <!-------- Dark mode activations------------->
-        </q-item>
+&lt;!&ndash;          <q-toggle :value="$q.dark.isActive" @click="$q.dark.toggle()" />&ndash;&gt;
+          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45; Dark mode activations-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
+        </q-item>-->
       </q-toolbar>
     </q-header>
 
@@ -314,13 +305,16 @@
             icon="login"
             round
             text-color="black"
-            size="18px"
+            size="13px"
             dense
           />
         </q-item-section>
 
       </q-item >
-      <q-item v-else>
+      <q-item v-else
+              :offset="fabPos"
+              :disable="draggingFab"
+      >
         <q-fab
           icon="menu"
           direction="left"

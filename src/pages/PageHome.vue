@@ -32,13 +32,6 @@
                     </q-item-label>
                   </q-item-section>
                 </q-item>
-<!--
-
-              <emoji :emoji="{ id: 'monkey_face', skin: 3 }" :size="16" />
--->
-
-
-
 
                 <q-separator />
 
@@ -54,74 +47,58 @@
                           <div class="text-caption text-grey" ref="postTimer" >{{post.created_dates.created_at_human}}</div>
                         </q-item-section>
                         <!-------------- Follow _--------------->
-                        <q-item-section >
-<!--                          {{post.author.follow}}-->
-
+                        <q-item-section
+                          @click="follow(post, post.author.id)"
+                        >
                           <q-item dense clickable v-ripple active="active" active-class="text-blue">
-                            <q-btn
-                              size="10px"
-                              class="q-px-xs"
+                            <q-icon
+                              :name="post.author.follow.is_user_following?'eva-person-add':'eva-person-add-outline'"
                               color="blue"
-                              :label="post.author.follow.is_user_following?'FOLLOWING':'FOLLOW'"
-                              icon="eva-person-add-outline"
+                              size="18px"
+                              rounded
                               dense
-                              flat
                               padding="xs"
-                              @click="follow(post, post.author.id)"
+                              flat
                             />
-<!--                            <q-item-section avatar>
-                              <q-icon name="eva-person-add-outline" />
-                            </q-item-section>-->
-                            <q-item-section>
-                              <q-btn
-                                size="10px"
-                                class="q-px-xs"
-                                color="blue"
-                                :label="post.author.follow.follower_count === 0?'':post.author.follow.follower_count"
-                                icon="eva-people"
-                                dense
-                                flat
-                                padding="xs"
-                              />
-<!--                              {{post.author.follow.following_count ===0}}-->
-                            </q-item-section>
-                            <q-item-section>
-                              <q-btn
-                                size="10px"
-                                class="q-px-xs"
-                                color="blue"
-                                :label="post.author.follow.following_count===0?'':post.author.follow.following_count"
-                                icon="eva-people-outline"
-                                dense
-                                flat
-                                padding="xs"
-                              />
-<!--                              {{post.author.follow.following_count}}-->
-                            </q-item-section>
-<!--                            <q-item-section side>{{post.author.follow.following_count}}</q-item-section>-->
+                              {{post.author.follow.is_user_following?'following':'follow'}}
+
+                            <q-space/>
+                            <q-icon
+                              :name="post.author.follow.follower_count === 0?'eva-people-outline':'eva-people'"
+                              color="blue"
+                              size="18px"
+                              rounded
+                              dense
+                              padding="xs"
+                              flat
+                            />
+                            {{post.author.follow.follower_count === 0?'':post.author.follow.follower_count}}
+
+
                           </q-item>
                         </q-item-section>
-                        <!-------------- Follow _--------------->
+                        <!-------------- Follow Ends _--------------->
+
+                        <q-space/>
 
                         <!---------Like Section Start ------------->
-                        <q-btn
+                        <q-icon
+                          :name="post.likes.icon_class"
+                          :color="post.likes.is_liked? 'red' : ''"
+                          size="20px"
                           @click="submitLike(post)"
                           rounded
                           dense
-                          :label="post.likes.likes_count === 0?'':post.likes.likes_count"
                           padding="xs"
-                        >
-                          <q-icon
-                            :name="post.likes.icon_class"
-                            :color="post.likes.is_liked? 'red' : ''"
-                            size="30px"
-                            rounded
-                          />
-                        </q-btn>
+                          flat
+                        />
+                        {{post.likes.likes_count === 0?'':post.likes.likes_count}}
                         <!---------Like Section End ------------->
+
                       </q-item>
                       <!---------Click to activate Input Start------------->
                       <q-btn
+                        v-show="$auth.check()"
                         color="grey-1"
                         text-color="black"
                         size="10px"
@@ -132,9 +109,9 @@
                       />
                       <!---------Click to activate Input End------------->
 
-
                       <!---------Comment Input Section ------------->
                       <q-input
+                        v-show="$auth.check()"
                         v-if="activateAddComment"
                         label="Add comment"
                         v-model="commentBox[index]"
@@ -146,8 +123,8 @@
                         @keyup.esc="commentBox[index]=''"
                       >
                         <template v-slot:before>
-                          <q-avatar>
-                            <img src="https://cdn.quasar.dev/img/avatar5.jpg">
+                          <q-avatar >
+                            <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">
                           </q-avatar>
                         </template>
                         <template v-slot:after>
@@ -296,7 +273,6 @@
                               text-color="black"
                               bg-color="blue-grey-1"
                               dense
-                              label=""
                             >
                             </q-chat-message>
 
@@ -317,6 +293,7 @@
                               <template v-slot:before>
                                 <q-avatar>
 <!--                                  <img src="https://cdn.quasar.dev/img/avatar5.jpg">-->
+<!--                                  <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">-->
                                 </q-avatar>
                               </template>
                               <template v-slot:after>
@@ -409,7 +386,6 @@
             <q-item class="fixed">
               <q-item-section avatar>
                 <q-avatar size="48px">
-<!--                  <img src="../statics/avat_atem.png">-->
                   <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">
                 </q-avatar>
               </q-item-section>
@@ -470,48 +446,41 @@ export default {
 
     getPosts() {
       this.loadingPosts = true;
-
        let  user_id = this.$auth.check()? this.$auth.user().id : 1
 
       this.$axios.get(`${process.env.API}/posts?user_id=`+user_id ).then(response => {
             this.posts= response.data.data.reverse()
 
-       // console.log(this.$auth.user().id)
-        // console.log(this.posts[0].author.id)
-        //  console.log(this.posts[0].author.follow)
-        //  console.log(this.posts[0])
+        let follow = { "is_user_following": false, "follower_count": 0, "following_count": 0 }
+        for (let i = 0; i < this.posts.length; i++) {
+          this.posts[i].author.follow = response.data.data[i].author.follow?response.data.data[i].author.follow:follow
 
-
-        if (this.$auth.check()){
-          for (let i = 0; i < this.posts.length; i++) {
-
-
-            this.posts[i].author.follow = response.data.data[i].author.follow
-
-            this.posts[i].comments = response.data.data[i].comments.reverse()
-            for (var j = 0; j < this.posts[i].comments.length ; j++){
-              this.posts[i].comments[j].childComments = response.data.data[i].comments[j].childComments.reverse()
-            }
-
-
-            const reactions = response.data.data[i].reactions
-
-            const result = Object.keys(reactions).map(function(key) {
-              return  reactions[key];
-            });
-
-            let existing_reaction = result.find(
-              o => o.reacter_id === this.$auth.user().id
-                && o.reactant_id === response.data.data[i].id
-            );
-
-            if (existing_reaction){
-              this.posts[i].likes.icon_class = 'eva-heart'
-              this.posts[i].likes.is_liked = true
-            }
-
+          this.posts[i].comments = response.data.data[i].comments.reverse()
+          for (var j = 0; j < this.posts[i].comments.length ; j++){
+            this.posts[i].comments[j].childComments = response.data.data[i].comments[j].childComments.reverse()
           }
+
+          const reactions = response.data.data[i].reactions
+
+          const result = Object.keys(reactions).map(function(key) {
+            return  reactions[key];
+          });
+
+          let existing_reaction = result.find(
+            o => o.reacter_id === this.$auth.user().id
+              && o.reactant_id === response.data.data[i].id
+          );
+
+          if (existing_reaction){
+            this.posts[i].likes.icon_class = 'eva-heart'
+            this.posts[i].likes.is_liked = true
+          }
+
         }
+        if (this.$auth.check()){
+        }
+
+        console.log(this.posts)
 
         this.loadingPosts = false;
 
@@ -710,14 +679,6 @@ export default {
       }
 
       const userId = this.$auth.user().id
-
-      console.log(userId)
-      console.log(authorId)
-
-      console.log('AUTHOR')
-      console.log(authorId)
-      console.log('USER')
-      console.log(this.$auth.user())
 
       if (userId === authorId){
        this.$q.dialog({ 'message' : "Hmmm! Trying to follow the man in the mirror ? " +

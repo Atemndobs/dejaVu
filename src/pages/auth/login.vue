@@ -162,8 +162,7 @@ export default {
 
       this.$auth
         .login(this.data)
-        .then(response => {
-
+        .then(() => {
           this.$auth.fetch()
           this.$router.replace('/')
           this.$store.dispatch('auth/loginCallback')
