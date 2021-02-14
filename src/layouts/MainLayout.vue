@@ -377,6 +377,7 @@ export default {
   name: 'MainLayout',
   data() {
     return {
+      loggedInUser:'atem',
       showAppInstallBanner: false,
       fabPos: [ 18, 18 ],
       draggingFab: false

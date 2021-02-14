@@ -13,8 +13,8 @@
                 <q-item>
                   <q-item-section avatar>
                     <q-avatar>
-                      <img src="../statics/avat_atem.png">
-<!--                      <img :src="post.author.photo_url">-->
+<!--                      <img src="../statics/avat_atem.png">-->
+                      <img :src="post.author.avatar">
 
                     </q-avatar>
                   </q-item-section>
@@ -409,14 +409,15 @@
             <q-item class="fixed">
               <q-item-section avatar>
                 <q-avatar size="48px">
-                  <img src="../statics/avat_atem.png">
+<!--                  <img src="../statics/avat_atem.png">-->
+                  <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">
                 </q-avatar>
               </q-item-section>
               <q-item-section>
                 <q-item-label
-                class="text-bold">atem__ndobs</q-item-label>
+                class="text-bold">{{this.$auth.user()?this.$auth.user().name:'Please Login'}}</q-item-label>
                 <q-item-label caption>
-                   {{this.$auth.user()?this.$auth.user().name:'Atemkeng'}}
+                   {{this.$auth.user()?this.$auth.user().name:'Please Login'}}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -443,6 +444,7 @@ export default {
   },
   data() {
     return{
+      imageSrc: this.$auth.user()?this.$auth.user().photo_url:'favicon.ico',
       posts: [],
       commentBox:[],
       replyBox:[],
@@ -453,7 +455,6 @@ export default {
       cars:[],
       activeInput:false,
       activateAddComment:false,
-
     }
   },
   filters: {
@@ -470,19 +471,15 @@ export default {
     getPosts() {
       this.loadingPosts = true;
 
-       let  user_id = this.$auth.check()? this.$auth.user().id : null
-
-      console.log(this.$auth.check())
-      console.log(user_id)
+       let  user_id = this.$auth.check()? this.$auth.user().id : 1
 
       this.$axios.get(`${process.env.API}/posts?user_id=`+user_id ).then(response => {
             this.posts= response.data.data.reverse()
 
        // console.log(this.$auth.user().id)
-        console.log(this.posts[0].author.id)
-        console.log(this.posts[0].author.follow)
-        console.log(this.posts[0])
-
+        // console.log(this.posts[0].author.id)
+        //  console.log(this.posts[0].author.follow)
+        //  console.log(this.posts[0])
 
 
         if (this.$auth.check()){
@@ -714,8 +711,17 @@ export default {
 
       const userId = this.$auth.user().id
 
+      console.log(userId)
+      console.log(authorId)
+
+      console.log('AUTHOR')
+      console.log(authorId)
+      console.log('USER')
+      console.log(this.$auth.user())
+
       if (userId === authorId){
-       this.$q.dialog({ 'message' : "Hmmm! It looks like you are trying follow yourself" + christmas })
+       this.$q.dialog({ 'message' : "Hmmm! Trying to follow the man in the mirror ? " +
+           "We admire the Self Love, but its recommended to follow someone else" + christmas })
         //this.$q.dialog({ 'message' : '<emoji :emoji="{ id: \'santa\', skin: 3 }" :size="16" />' })
 
         console.log(emojiIndex.search('christmas'))
@@ -750,8 +756,9 @@ export default {
       return this.activateAddComment = !this.activateAddComment
     },
 
-    pusherData()
-    {
+    // ############### SOCKETS #####################//
+
+    pusherData() {
       const pusher = new Pusher('8643c99a8b00ff38c513', {
         cluster: 'eu'
       });
@@ -1045,13 +1052,14 @@ export default {
       );
     },
 
+    // ############## SOCKETS #####################//
     activateEditComment(comment){
       return true
     },
 
     editComment(comment){
       this.set = true
-      console.log(comment)
+     // console.log(comment)
     },
 
   },
@@ -1059,12 +1067,10 @@ export default {
   created() {
     setTimeout(()=>{
       this.getPosts()
-    }, 100)
-
+    }, 200)
   },
 
   mounted() {
-
     if (!this.$auth.user()){
       if (process.env.API === 'http://localhost:8000/api'){
         this.pushEcho()

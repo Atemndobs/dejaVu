@@ -163,7 +163,7 @@ export default {
       this.$auth
         .login(this.data)
         .then(response => {
-          response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
+
           this.$auth.fetch()
           this.$router.replace('/')
           this.$store.dispatch('auth/loginCallback')
@@ -220,7 +220,7 @@ export default {
       const apiUrl = process.env.API+"/users"
       axios.get(apiUrl)
         .then(response => {
-          console.log(response)
+          // console.log(response)
           Object.entries(response.data.data).forEach(([key, user]) => {
             this.data.users.push(user.email)
           });

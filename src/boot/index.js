@@ -131,6 +131,8 @@ export default ({ app, router, store, Vue }) => {
   helper.user = () => { return store.getters['auth/user'] }
   Vue.prototype.$auth = helper
 
-  store.commit('auth/addLoginCallback', () => console.log('Logged in'))
+  store.commit('auth/addLoginCallback', () => {
+    console.log('Logged in')
+  })
 
 }

@@ -9,15 +9,8 @@
 const { configure } = require('quasar/wrappers');
  API_PRODUCTION = 'https://atemkeng.com/api'
  API_LOCAL = 'http://127.0.0.1:8000/api'
- API_DOCKER = 'http://localhost/api'
+ API_DOCKER = 'http://localhost:8090/api'
  API_VALET = 'https://pixelate.app/api'
-
-API_MUSIC = 'https://api.next-song.app/v1'
-  VUE_APP_WEBSOCKETS_ID="local"
-  VUE_APP_WEBSOCKETS_KEY="local"
-  VUE_APP_WEBSOCKETS_SERVER="http://127.0.0.1"
-  VUE_APP_WEBSOCKETS_CLUSTER="eu"
-
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -58,7 +51,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API:API_VALET
+        API:API_PRODUCTION
          // ? 'https://dev.' + process.env.API_LOCAL
          // : 'https://prod.' + process.env.API_PROD
 
