@@ -1,31 +1,32 @@
 <template>
-  <q-page class="constrain q-pa-md">
+  <div>
+    <q-page class="constrain q-pa-md">
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-sm-8">
+
           <template v-if="!loadingPosts && posts.length">
-            <q-card
-                v-for="(post, index) in posts"
-                :key="post.id"
+            <div v-for="(post, index) in posts" :key="post.id">
+              <q-card
                 bordered
                 class="card-post q-mb-md"
                 flat
-                >
+              >
+
                 <q-item>
                   <q-item-section avatar>
                     <q-avatar>
-<!--                      <img src="../statics/avat_atem.png">-->
-                      <img :src="post.author.avatar">
+                      <img :src="post.user.photo_url">
 
                     </q-avatar>
                   </q-item-section>
 
                   <q-item-section>
                     <q-item-label
-                    class="text-bold">
+                      class="text-bold">
 
                     </q-item-label>
                     <q-item-label caption>
-                      {{post.author.name}}
+                      {{post.user.name}}
                     </q-item-label>
                     <q-item-label caption>
                       {{post.location}}
@@ -34,8 +35,14 @@
                 </q-item>
 
                 <q-separator />
-
-                <q-img :src="post.imageUrl"/>
+                <template>
+                  <v-lazy-image
+                    :src="post.imageUrl"
+                    src-placeholder="https://cdn-images-1.medium.com/max/80/1*xjGrvQSXvj72W4zD6IWzfg.jpeg"
+                  />
+                </template>
+              <!--- Image Emoji ?  -->
+<!--                <VueEmojiReact v-model="emojis"/>-->
 
                 <q-card-section>
                   <!---------Post Section Start ------------->
@@ -44,15 +51,17 @@
                       <q-item>
                         <q-item-section >
                           <div >{{post.caption}}</div>
-                          <div class="text-caption text-grey" ref="postTimer" >{{post.created_dates.created_at_human}}</div>
+                          <div class="text-caption text-grey" ref="postTimer" >
+                            {{post.created_dates.created_at_human}}
+                          </div>
                         </q-item-section>
                         <!-------------- Follow _--------------->
                         <q-item-section
-                          @click="follow(post, post.author.id)"
+                          @click="follow(post, post.user.id)"
                         >
                           <q-item dense clickable v-ripple active="active" active-class="text-blue">
                             <q-icon
-                              :name="post.author.follow.is_user_following?'eva-person-add':'eva-person-add-outline'"
+                              :name="post.is_user_following?'eva-person-add':'eva-person-add-outline'"
                               color="blue"
                               size="18px"
                               rounded
@@ -60,11 +69,11 @@
                               padding="xs"
                               flat
                             />
-                              {{post.author.follow.is_user_following?'following':'follow'}}
+                            {{post.is_user_following?'following':'follow'}}
 
                             <q-space/>
                             <q-icon
-                              :name="post.author.follow.follower_count === 0?'eva-people-outline':'eva-people'"
+                              :name="post.user.follower_count === 0?'eva-people-outline':'eva-people'"
                               color="blue"
                               size="18px"
                               rounded
@@ -72,7 +81,7 @@
                               padding="xs"
                               flat
                             />
-                            {{post.author.follow.follower_count === 0?'':post.author.follow.follower_count}}
+                            {{post.user.follower_count === 0?'':post.user.follower_count}}
 
 
                           </q-item>
@@ -83,8 +92,8 @@
 
                         <!---------Like Section Start ------------->
                         <q-icon
-                          :name="post.likes.icon_class"
-                          :color="post.likes.is_liked? 'red' : ''"
+                          :name="post.loveReactant.icon_class"
+                          :color="post.is_liked? 'red' : 'black'"
                           size="20px"
                           @click="submitLike(post)"
                           rounded
@@ -92,7 +101,7 @@
                           padding="xs"
                           flat
                         />
-                        {{post.likes.likes_count === 0?'':post.likes.likes_count}}
+                        {{post.likes_count === 0?'':post.likes_count}}
                         <!---------Like Section End ------------->
 
                       </q-item>
@@ -141,214 +150,231 @@
                   <!---------Post Section End ------------->
 
                   <!---------Comment Display Section Start ------------->
+
                   <q-list bordered class="rounded-borders">
+
                     <q-expansion-item
-                      v-show="post.comments_count >0"
+                      v-show="post.comments_count > 0"
                       expand-separator
                       icon="eva-message-circle-outline"
-                      :caption="'latest : ' + post.new_comment.comment"
+                      :caption="'latest : ' + post.new_comment"
                       :label="post.comments_count + ' comments'"
                       default-closed
                     >
 
                       <!---------Comment Start ------------->
-                        <q-card >
-                          <q-card-section v-for="(comment, index) in post.comments"  :key="comment.id">
+                      <q-card >
+                        <q-card-section v-for="(comment, index) in post.comments"  :key="comment.id" @click="emoShow = false">
+                          <!---------Edit Comment Start ------------->
+                          <template >
+                            <div class="q-pa-md" v-show="activeInput">
+                              <div class="cursor-pointer">
+                                <q-icon name="edit" right v-show="activateEditComment(comment)"></q-icon>
+                                <q-popup-edit v-model="comment.comment" :validate="val => val.length > 5">
+                                  <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                                    <q-input
+                                      autofocus
+                                      dense
+                                      :value="comment.comment"
+                                      hint="Edit this Comment"
+                                      :rules="[val => validate(value) || 'More than '+ val.length +' chars required']"
+                                      @input="emitValue"
+                                      @keydown.enter.prevent="editComment(comment.comment)"
+                                    >
 
-                            <!---------Edit Comment Start ------------->
-                            <template >
-                              <div class="q-pa-md" v-show="activeInput">
-                                <div class="cursor-pointer">
-                                  <q-icon name="edit" right v-show="activateEditComment(comment)"></q-icon>
-                                  <q-popup-edit v-model="comment.comment" :validate="val => val.length > 5">
-                                    <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                                      <q-input
-                                        autofocus
-                                        dense
-                                        :value="comment.comment"
-                                        hint="Edit this Comment"
-                                        :rules="[val => validate(value) || 'More than '+ val.length +' chars required']"
-                                        @input="emitValue"
-                                        @keydown.enter.prevent="editComment(comment.comment)"
-                                      >
-
-                                        <template v-slot:after>
-                                          <q-btn
-                                            dense flat icon="send"
-                                            @click="editComment(comment.comment)"
-                                            @click.stop="set"
-                                          />
-                                          <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
-                                          <q-btn flat dense color="positive" icon="check_circle" @click.stop="set"
-                                                 @click="editComment(comment.comment)"
-                                                 :disable="validate(value) === false || initialValue === value" />
-                                        </template>
-                                      </q-input>
-                                    </template>
-                                  </q-popup-edit>
-                                </div>
+                                      <template v-slot:after>
+                                        <q-btn
+                                          dense flat icon="send"
+                                          @click="editComment(comment.comment)"
+                                          @click.stop="set"
+                                        />
+                                        <q-btn flat dense color="negative" icon="cancel" @click.stop="cancel" />
+                                        <q-btn flat dense color="positive" icon="check_circle" @click.stop="set"
+                                               @click="editComment(comment.comment)"
+                                               :disable="validate(value) === false || initialValue === value" />
+                                      </template>
+                                    </q-input>
+                                  </template>
+                                </q-popup-edit>
                               </div>
-                            </template>
-                            <!---------Edit Comment End ------------->
-<!--
-                            {{comment.reaction_count}}-->
-                            <!---------Comment Reactions Start ------------->
-                            <q-item >
-                                <q-fab
-                                  label=""
-                                  label-position="top"
-                                  external-label
-                                  color="transparent"
-                                  icon="keyboard_arrow_right"
-                                  direction="right"
-                                  text-color="black"
-                                  padding="xs"
-                                >
-                                <q-fab-action
-                                  @click="reactComment('Like',comment, post)"
-                                  icon="thumb_up"
-                                  external-label
-                                  label-position="top"
-                                  text-color="red"
-                                  :label="comment.reaction_count[1] > 0 ? comment.reaction_count[1]  :'' "
-                                  padding="xs"
-                                />
-                                <q-fab-action
-                                  @click="reactComment('DisLike',comment, post)"
-                                  icon="thumb_down"
-                                  external-label
-                                  label-position="top"
-                                  text-color="black"
-                                  :label="comment.reaction_count[2]  > 0 ? comment.reaction_count[2]  :''"
-                                  padding="xs"
-                                />
-                                <q-fab-action
-                                  @click="reactComment('Happy',comment, post)"
-                                  icon="eva-smiling-face-outline"
-                                  external-label
-                                  label-position="top"
-                                  text-color="black"
-                                  :label="comment.reaction_count[5]  > 0 ? comment.reaction_count[5]  :''"
-                                  padding="xs"
-                                />
-                                  <q-fab-action
-                                    @click="reactComment('DisHappy',comment, post)"
-                                    icon="eva-person-done-outline"
-                                    external-label
-                                    label-position="top"
-                                    text-color="amber"
-                                    :label="comment.reaction_count[6]  > 0 ? comment.reaction_count[6]  :''"
-                                    padding="xs"
-                                  />
-                                  <q-fab-action
-                                  @click="reactComment('Surprise',comment, post)"
-                                  icon="eva-twitter-outline"
-                                  external-label
-                                  label-position="top"
-                                  text-color="blue"
-                                  :label="comment.reaction_count[7]  > 0 ? comment.reaction_count[7]  :''"
-                                  padding="xs"
-                                />
-                                  <q-fab-action
-                                  @click="reactComment('Smile',comment, post)"
-                                  icon="eva-eye-outline"
-                                  external-label
-                                  label-position="top"
-                                  text-color="black"
-                                  :label="comment.reaction_count[9] > 0 ? comment.reaction_count[9]  :''"
-                                  padding="xs"
-                                />
-                                </q-fab>
-
-                            </q-item>
-                            <!---------Comment Reactions  End------------->
-                            <q-chat-message
-                              @click="switchInput"
-                              :name="comment.commenter.name"
-                              :avatar="comment.commenter.photo_url"
-                              position="up"
-                              :text="[comment.comment]"
-                              size=""
-                              :stamp="comment.created_dates.created_at_human"
-                              text-color="black"
-                              bg-color="blue-grey-1"
-                              dense
-                            >
-                            </q-chat-message>
-
-
-                            <!---------Comment Reply Input Start  ------------->
-                            <q-input
-                              v-show="activeInput"
-                              switch-toggle-side dense-toggle :header-inset-level="1" :content-inset-level="2"
-                              label="...whats your opinion"
-                              v-model="replyBox[index]"
-                              class="col col-sm-6"
-                              dense
-                              @keydown.enter.prevent="replyComment(replyBox[index], comment,post)"
-                              icon="eva-message-circle-outline"
-                              options-dens
-                              @keyup.esc="replyBox[index]=''"
-                            >
-                              <template v-slot:before>
-                                <q-avatar>
-<!--                                  <img src="https://cdn.quasar.dev/img/avatar5.jpg">-->
-<!--                                  <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">-->
-                                </q-avatar>
-                              </template>
-                              <template v-slot:after>
-                                <q-btn
-                                  round dense flat icon="send"
-                                  @click.prevent="replyComment(replyBox[index], comment, post)"
-                                />
-                              </template>
-                            </q-input>
-                            <div class="row justify-center q-ma-md">
                             </div>
-                            <!---------Comment Reply Input End ------------->
-
-                            <!---------Comment  ------------->
-
-                            <!---------Replies  ------------->
-                            <q-expansion-item
-                              v-show="comment.childComments.length > 0"
-                              switch-toggle-side dense-toggle :header-inset-level="1" :content-inset-level="2"
-                              expand-separator
-                              icon="eva-message-circle"
-                              label="All reactions"
-                              :caption="comment.childComments.length + ' reactions'"
-                              default-closed
-                              bg-color="blue-grey-12"
+                          </template>
+                          <!---------Edit Comment End ------------->
+                          <!--{{comment.reaction_count}}-->
+                          <!---------Comment Reactions Start ------------->
+                          <q-item >
+                            <q-fab
+                              label=""
+                              label-position="top"
+                              external-label
+                              color="transparent"
+                              icon="keyboard_arrow_right"
+                              direction="right"
+                              text-color="black"
+                              padding="xs"
+                              dense
+                              flat
                             >
-                              <q-chat-message
-                                v-if="comment.childComments.length > 0"
-                                v-for="(childComment, index) in comment.childComments"
-                                :key="childComment.id"
-                                :name="childComment.commenter.name"
-                                :avatar="childComment.commenter.photo_url"
-                                position="up"
-                                :text="[childComment.comment]"
-                                :stamp="childComment.created_at | niceDate"
-                                text-color="dark-blue"
-                                bg-color="amber-1"
+                              <q-fab-action
+                                @click="reactComment('Like',comment, post)"
+                                :icon="reactionEmoji('thumbsup')"
+                                external-label
+                                label-position="top"
+                                text-color="red"
+                                :label="comment.reaction_count[1] > 0 ? comment.reaction_count[1]  :'' "
+                                padding="xs"
                                 dense
-                                label=""
-                                sent
+                                flat
                               />
+                              <q-fab-action
+                                @click="reactComment('DisLike',comment, post)"
+                                :icon="reactionEmoji('thumbsdown')"
+                                external-label
+                                label-position="top"
+                                text-color="black"
+                                :label="comment.reaction_count[2]  > 0 ? comment.reaction_count[2]  :''"
+                                padding="xs"
+                                dense
+                                flat
+                              />
+                              <q-fab-action
+                                @click="reactComment('Happy',comment, post)"
+                                :icon="reactionEmoji('smiley_cat')"
+                                external-label
+                                label-position="top"
+                                text-color="black"
+                                :label="comment.reaction_count[5]  > 0 ? comment.reaction_count[5]  :''"
+                                padding="xs"
+                                dense
+                                flat
+                              />
+                              <q-fab-action
+                                @click="reactComment('DisHappy',comment, post)"
+                                :icon="reactionEmoji('rage')"
+                                external-label
+                                label-position="top"
+                                text-color="amber"
+                                :label="comment.reaction_count[6]  > 0 ? comment.reaction_count[6]  :''"
+                                padding="xs"
+                                dense
+                                flat
+                              />
+                              <q-fab-action
+                                @click="reactComment('Surprise',comment, post)"
+                                :icon="reactionEmoji('shrug')"
+                                external-label
+                                label-position="top"
+                                text-color="blue"
+                                :label="comment.reaction_count[7]  > 0 ? comment.reaction_count[7]  :''"
+                                padding="xs"
+                                dense
+                                flat
+                              />
+                              <q-fab-action
+                                @click="reactComment('Smile',comment, post)"
+                                :icon="reactionEmoji('shocked_face_with_exploding_head')"
+                                external-label
+                                label-position="top"
+                                text-color="black"
+                                :label="comment.reaction_count[9] > 0 ? comment.reaction_count[9]  :''"
+                                padding="xs"
+                                dense
+                                flat
+                              />
+                            </q-fab>
 
-                            </q-expansion-item>
-                            <!---------Replies  ------------->
+                          </q-item>
+                          <!---------Comment Reactions  End------------->
 
-                          </q-card-section>
-                        </q-card>
+                          <q-chat-message
+                            @click="switchInput"
+                            :name="comment.commenter.name"
+                            :avatar="comment.commenter.photo_url"
+                            position="up"
+                            :text="[comment.comment]"
+                            size=""
+                            :stamp="comment.created_dates.created_at_human"
+                            text-color="black"
+                            bg-color="blue-grey-1"
+                            dense
+                          >
+                          </q-chat-message>
+                          <!-- comment reacting Emojis?  seems to cause slow response time-->
+                          <!--   <VueEmojiReact v-model="emojis"/>-->
+
+                          <!---------Comment Reply Input Start  ------------->
+                          <q-input
+                            v-show="activeInput"
+                            switch-toggle-side dense-toggle :header-inset-level="1" :content-inset-level="2"
+                            label="...whats your opinion"
+                            v-model="replyBox[index]"
+                            class="col col-sm-6"
+                            dense
+                            @keydown.enter.prevent="replyComment(replyBox[index], comment,post)"
+                            icon="eva-message-circle-outline"
+                            options-dens
+                            @keyup.esc="replyBox[index]=''"
+                          >
+                            <template v-slot:before>
+                              <q-avatar>
+                                <img :src="$auth.user()?$auth.user().photo_url:'https://cdn.quasar.dev/img/avatar5.jpg'">
+                              </q-avatar>
+                            </template>
+                            <template v-slot:after>
+                              <q-btn
+                                round dense flat icon="send"
+                                @click.prevent="replyComment(replyBox[index], comment, post)"
+                              />
+                            </template>
+                          </q-input>
+                          <div class="row justify-center q-ma-md">
+                          </div>
+                          <!---------Comment Reply Input End ------------->
+
+                          <!---------Comment  ------------->
+
+                          <!---------Replies  ------------->
+                          <q-expansion-item
+                            v-show="comment.childComments.length > 0"
+                            switch-toggle-side dense-toggle :header-inset-level="1" :content-inset-level="2"
+                            expand-separator
+                            icon="eva-message-circle"
+                            label="All reactions"
+                            :caption="comment.childComments.length + ' reactions'"
+                            default-closed
+                            bg-color="blue-grey-12"
+                          >
+                            <q-chat-message
+                              v-if="comment.childComments.length > 0"
+                              v-for="(childComment, index) in comment.childComments"
+                              :key="childComment.id"
+                              :name="childComment.commenter.name"
+                              :avatar="childComment.commenter.photo_url"
+                              position="up"
+                              :text="[childComment.comment]"
+                              :stamp="childComment.created_at | niceDate"
+                              text-color="dark-blue"
+                              bg-color="amber-1"
+                              dense
+                              label=""
+                              sent
+                            />
+
+                          </q-expansion-item>
+                          <!---------Replies  ------------->
+
+                        </q-card-section>
+                      </q-card>
                       <!---------Comment End ------------->
 
                     </q-expansion-item>
                   </q-list>
                   <!---------Comment Display Section End ------------->
                 </q-card-section>
-            </q-card>
+              </q-card>
+            </div>
           </template>
+
           <template v-else-if="!loadingPosts && !posts.length">
             <h5 class="text-center text-grey">
               No POSTS HERE
@@ -383,41 +409,123 @@
           </template>
         </div>
         <div class="col-4 large-screen-only">
-            <q-item class="fixed">
-              <q-item-section avatar>
-                <q-avatar size="48px">
-                  <img :src="$auth.user()?$auth.user().photo_url:'favicon.ico'">
+          <q-item-section class="fixed">
+            <q-item >
+              <q-btn rounded flat to="/account/home">
+                <q-avatar size="48px" >
+                  <img :src="this.$auth.user()?this.$auth.user().photo_url:'favicon.ico'"  alt="profile image">
                 </q-avatar>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label
-                class="text-bold">{{this.$auth.user()?this.$auth.user().name:'Please Login'}}</q-item-label>
-                <q-item-label caption>
-                   {{this.$auth.user()?this.$auth.user().name:'Please Login'}}
-                </q-item-label>
+              </q-btn>
+              <q-item-section
+                class="text-bold">{{this.$auth.user()?this.$auth.user().name:'Please Login'}}
               </q-item-section>
             </q-item>
 
+            <q-item v-if="this.$auth.check()">
+              <q-item-section  >
+                <q-item-label caption class="text-overline text-gray q-pa-xs">
+                  {{this.$auth.user()?this.$auth.user().formatted_address:'Please Login'}}
+                </q-item-label>
+                <q-item-label caption class="text-overline text-orange-9 q-pa-xs">
+                  About me
+                </q-item-label>
+                <q-item-label caption class="q-pa-xs">
+                  {{this.$auth.user()?this.$auth.user().about:''}}
+                </q-item-label>
+                <q-item-label caption class="text-teal-9 q-pa-xs">
+                  {{this.$auth.user()?this.$auth.user().tagline:''}}
+                </q-item-label>
+
+                <q-item-label caption class="text-blue-9 q-pa-xs">
+                  Followers : {{this.$auth.user()?this.$auth.user().followers.length:''}}
+                </q-item-label>
+
+                <q-item-label caption class="text-blue-9 q-pa-xs">
+                  Following : {{this.$auth.user()?this.$auth.user().following_count:''}}
+                </q-item-label>
+                <q-item-label caption class="text-blue-9 q-pa-xs">
+                  Available to hire : {{this.$auth.user().available_to_hire?'Yes':'No'}}
+                </q-item-label>
+
+                <q-item-label caption class="text-blue-9 q-pa-xs">
+                  Designs : {{this.$auth.user()?this.$auth.user().post_count:''}}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-item-section>
         </div>
       </div>
-  </q-page>
+    </q-page>
+
+    <!-- PAGINATION -->
+<!--    <div class="card-footer pb-0 pt-3 q-pa-xl" >
+      <q-pagination
+        input
+        input-class="text-orange-10"
+
+        v-model="current"
+        :max="totalPages"
+        :direction-links="true"
+        :boundary-links="true"
+        :max-pages="6"
+        dark
+        :boundary-numbers="true"
+        icon-first="skip_previous"
+        icon-last="skip_next"
+        icon-prev="fast_rewind"
+        icon-next="fast_forward"
+        @click="nextPage"
+      >
+      </q-pagination>
+    </div>-->
+    <!-- Infinite Scroll -->
+    <infinite-loading @infinite="infiniteHandler" spinner="bubbles" >
+
+      <div slot="no-more">
+        <h5 class="text-center text-grey">
+          You are all caught up !
+          {{ tada }}
+<!--          <picker set="emojione" />
+          <picker @select="addEmoji" />
+          <picker title="Pick your emoji…" emoji="point_up" />
+          <picker :style="{ position: 'absolute', bottom: '20px', right: '20px' }" />
+          <picker :i18n="{ search: 'Recherche', categories: { search: 'Résultats de recherche', recent: 'Récents' } }" />-->
+        </h5>
+
+      </div>
+      <div slot="no-results">No POSTS HERE : Create your First Post! </div>
+    </infinite-loading>
+
+  </div>
 </template>
 
 <script>
 import {date} from 'quasar'
 import axios from "axios";
 import Echo from 'laravel-echo'
-import { Emoji } from 'emoji-mart-vue'
 import { emojiIndex } from 'emoji-mart-vue'
 import { emojis } from 'emoji-mart-vue'
+import InfiniteLoading from 'vue-infinite-loading';
+import VueEmojiReact from 'vue-emoji-react'
+
+import Vue from "vue";
+import { VLazyImagePlugin } from "v-lazy-image";
+
+Vue.use(VLazyImagePlugin);
+Vue.component('VueEmojiReact', VueEmojiReact);
+
+
+import { Picker } from 'emoji-mart-vue'
 
 export default {
   name: 'Page',
   components: {
-    Emoji,
-    emojiIndex,
-    emojis
+    Picker,
+    VLazyImagePlugin,
+    InfiniteLoading,
+
   },
+
   data() {
     return{
       imageSrc: this.$auth.user()?this.$auth.user().photo_url:'favicon.ico',
@@ -431,6 +539,28 @@ export default {
       cars:[],
       activeInput:false,
       activateAddComment:false,
+   //   current: 1,
+    //  totalPages:5,
+      page: 1,
+      tada:'',
+      emojis : [
+        {
+          name: 'rage',
+          count: 2
+        },
+        {
+          name: 'blush',
+          count: 1
+        },
+        {
+          name: 'shrug',
+          count: 3
+        },
+        {
+          name: 'grinning',
+          count: 2
+        }
+      ]
     }
   },
   filters: {
@@ -443,51 +573,126 @@ export default {
     }
   },
   methods: {
-
-    getPosts() {
+    infiniteHandler($state) {
       this.loadingPosts = true;
-       let  user_id = this.$auth.check()? this.$auth.user().id : 1
+      let limit = 10;
+      let  user_id = this.$auth.check()? this.$auth.user().id : 1
+      let url = `${process.env.API}/posts?user_id=${user_id}&page=${this.page}&perPage=${limit}`
 
-      this.$axios.get(`${process.env.API}/posts?user_id=`+user_id ).then(response => {
-            this.posts= response.data.data.reverse()
+      axios.get(url)
+        .then(({ data }) => {
+        if (data.data.length) {
+          this.loadingPosts = false;
+          this.page += 1;
+          this.posts.push(...data.data);
+          $state.loaded();
+        } else {
+          $state.complete();
+          this.loadingPosts = false;
 
-        let follow = { "is_user_following": false, "follower_count": 0, "following_count": 0 }
-        for (let i = 0; i < this.posts.length; i++) {
-          this.posts[i].author.follow = response.data.data[i].author.follow?response.data.data[i].author.follow:follow
+          const Emoji = require('emoji-store');
+          this.tada = Emoji.get('tada')
+          console.log('TADA', this.tada );
+        }
+      })
+        .catch(error => {
+          console.log(error)
+          if (process.env.API){
+            this.$q.dialog({
+              title: 'Error',
+              message: 'Oops something went wrong, pls contact the Admin'
+            })
+          }else {
+            this.$q.dialog({
+              title: 'Error',
+              message: error.message
+            })
+          }
+          this.loadingPosts = false;
+        })
+    },
 
+    reactionEmoji(type){
+      const Emoji = require('emoji-store');
+      return Emoji.get(type)
+    },
+
+    addEmoji(){
+      return {
+        id: 'smile',
+        name: 'Smiling Face with Open Mouth',
+        colons: ':smiley:',
+        text: ':)',
+        emoticons: [
+          '=)',
+          '=-)'
+        ],
+        skin: null,
+        native: '😃'
+      }
+    },
+
+/*    getPosts(page = this.current, $state) {
+      this.loadingPosts = true;
+      let limit = 1;
+      let  user_id = this.$auth.check()? this.$auth.user().id : 1
+      let url = `${process.env.API}/posts?user_id=${user_id}&page=${page}&perPage=${limit}`
+
+      this.$axios.get(url).then(response => {
+        this.posts.unshift(...response.data.data.reverse());
+
+        if (response.data.data.length) {
+        //  this.page += 1;
+          this.posts.unshift(...response.data.data.reverse());
+          $state.loaded();
+        } else {
+          $state.complete();
+        }
+
+        //this.posts= response.data.data.reverse()
+        this.totalPages = response.data.pagination.totalPages
+       // console.log(response.data.pagination)
+
+
+        /!**
+
+         let follow = { "is_user_following": false, "follower_count": 0, "following_count": 0 }
+         for (let i = 0; i < this.posts.length; i++) {
+          this.posts[i].user.follow = response.data.data[i].user.follow?response.data.data[i].user.follow:follow
           this.posts[i].comments = response.data.data[i].comments.reverse()
+
+          console.log( this.posts[i])
+
+        //  console.log(this.posts[i].comments )
           for (var j = 0; j < this.posts[i].comments.length ; j++){
             this.posts[i].comments[j].childComments = response.data.data[i].comments[j].childComments.reverse()
           }
 
           const reactions = response.data.data[i].reactions
-
           const result = Object.keys(reactions).map(function(key) {
             return  reactions[key];
           });
 
-          let existing_reaction = result.find(
-            o => o.reacter_id === this.$auth.user().id
-              && o.reactant_id === response.data.data[i].id
-          );
-
-          if (existing_reaction){
-            this.posts[i].likes.icon_class = 'eva-heart'
-            this.posts[i].likes.is_liked = true
+          if (this.$auth.check()){
+            let existing_reaction = result.find(
+              o => o.reacter_id === this.$auth.user().id
+                && o.reactant_id === response.data.data[i].id
+            );
+            if (existing_reaction){
+              this.posts[i].loveReactant.icon_class = 'eva-heart'
+              this.posts[i].loveReactant.is_liked = true
+            }
           }
 
-        }
-        if (this.$auth.check()){
-        }
 
-        console.log(this.posts)
-
+        }
+         *!/
         this.loadingPosts = false;
 
       })
       .catch(error => {
         console.log(error)
-        if (process.env.API === 'http://localhost:8000/api'){
+        if (process.env.API){
           this.$q.dialog({
             title: 'Error',
             message: 'Oops something went wrong, pls contact Atem'
@@ -500,7 +705,7 @@ export default {
         }
         this.loadingPosts = false;
       })
-    },
+    },*/
 
     submitLike(post){
 
@@ -518,29 +723,32 @@ export default {
       let data = {
         user_id:userId,
         type:'Like',
-        post:post
       }
 
      // console.log(data)
       axios.post(apiUrl, data)
         .then(response => {
 
-          console.log(' RESPONSE ::')
+          console.log(' RESPONSE FROM USERa ::')
 
-          console.log(response.data.data)
+         // console.log(response.data.data)
           const position = this.posts.indexOf(post)
-          const reaction_type = response.data.likes.reaction_type
-          if (reaction_type === 'Like') {
-            this.posts[position].likes.icon_class = 'eva-heart'
-            this.posts[position].likes.is_liked = true
+
+          const reaction_type = response.data.data.reaction_type
+          if (reaction_type === data.type) {
+
+            this.posts[position].loveReactant.icon_class = 'eva-heart'
+            this.posts[position].is_liked = true
+            this.posts[position].likes_count = response.data.data.likes_count
           }else {
-            this.posts[position].likes.icon_class = 'eva-heart-outline'
-            this.posts[position].likes.is_liked = false
-            this.reactionType = 'eva-heart-outline'
+            this.posts[position].loveReactant.icon_class = 'eva-heart-outline'
+            this.posts[position].is_liked = false
+            this.posts[position].likes_count = response.data.data.likes_count
+         //   this.reactionType = 'eva-heart-outline'
 
           }
 
-          this.posts[position].likes.likes_count = response.data.likes.likes_count
+          this.posts[position].loveReactant.likes_count = response.data.loveReactant.likes_count
 
 
       }).catch(error => {
@@ -613,19 +821,44 @@ export default {
       let data = {
         user_id:userId,
         comment: comment,
-        post:post,
+        post:post.id,
       }
 
 
       axios.post(apiUrl, data)
         .then(response => {
-
           const position = this.posts.indexOf(post)
-          this.posts[position].new_comment = response.data.data.new_comment
-          this.posts[position].comments_count = response.data.data.comments_count
-          if (this.$auth.check()){
-            this.posts[position].comments.unshift(response.data.data.new_comment)
+          const currentPost = this.posts[position]
+          currentPost.comments_count = response.data.data['comment_count']
+          currentPost.new_comment = response.data.data.comment['comment']
+
+          console.log('RESPONSE')
+          console.log(response.data.data)
+          console.log('RESPONSE ENd')
+          console.log('POST  ===================')
+          console.log(currentPost.comments)
+          console.log('POST  END  ===================')
+
+
+          let newComment = {
+            id:'',
+            comment:response.data.data.comment['comment'],
+            commenter: {
+              name:response.data.data.comment.commenter['name'],
+              //photo_url:response.data.data.comment.commenter['photo_url']
+              photo_url:this.$auth.user().photo_url
+            },
+            childComments:{},
+            parent:{},
+            reaction_count: '',
+            reactions: '',
+            updated_dates:response.data.data.updated_dates,
+            created_dates:response.data.data.created_dates,
+
           }
+
+          currentPost.comments.unshift(newComment)
+         // console.log(currentPost)
 
           this.commentBox = [];
 
@@ -636,7 +869,6 @@ export default {
     },
 
     replyComment(reply,comment, post){
-
       if (!this.$auth.check()){
         this.$q.dialog({ 'message' : "You need to Login Before you can Like" })
         this.$router.push('/login')
@@ -648,24 +880,38 @@ export default {
 
       const apiUrl = process.env.API+"/comments/comment/"+comment.id
 
-
       let data = {
         comment: reply,
       }
 
-
       axios.post(apiUrl, data)
         .then(response => {
           const position = this.posts.indexOf(post)
+          const currentPost = this.posts[position]
           const commentPosition = this.posts[position].comments.indexOf(comment)
-          this.posts[position].comments[commentPosition].childComments.length = response.data.parent.childComments.length
-          this.posts[position].comments[commentPosition].childComments = response.data.parent.childComments.reverse()
+
+          let newComment = {
+            comment:response.data.data.comment,
+            commenter: {
+              name:response.data.data.commenter['name'],
+              photo_url:this.$auth.user().photo_url
+            },
+            childComments:{},
+            parent:response.data.data.parent,
+            reaction_count: response.data.data.reaction_count,
+            reactions: response.data.data.reactions,
+            updated_dates:response.data.data.updated_dates,
+            created_dates:response.data.data.created_dates,
+          }
+
+          currentPost.comments[commentPosition].childComments.unshift(newComment)
 
         }).catch(error => {
         console.log(error)
       })
       this.replyBox = []
     },
+
     follow(post, authorId){
       let christmas = emojiIndex.search('smile').map((o) => o.native)
 
@@ -683,9 +929,6 @@ export default {
       if (userId === authorId){
        this.$q.dialog({ 'message' : "Hmmm! Trying to follow the man in the mirror ? " +
            "We admire the Self Love, but its recommended to follow someone else" + christmas })
-        //this.$q.dialog({ 'message' : '<emoji :emoji="{ id: \'santa\', skin: 3 }" :size="16" />' })
-
-        console.log(emojiIndex.search('christmas'))
         return
       }
 
@@ -700,10 +943,10 @@ export default {
           console.log(response.data)
 
           const position = this.posts.indexOf(post)
-          console.log(this.posts[position].author.follow)
-
-          this.posts[position].author.follow = response.data
-
+          this.posts[position].user.follow = response.data
+          this.posts[position].user.follower_count = response.data.follower_count
+          this.$auth.user().follower_count = response.data.follower_count
+          this.$auth.user().following_count = response.data.following_count
 
         }).catch(error => {
         console.log(error)
@@ -717,7 +960,14 @@ export default {
       return this.activateAddComment = !this.activateAddComment
     },
 
-    // ############### SOCKETS #####################//
+    activateEditComment(comment){
+      return true
+    },
+    editComment(comment){
+      this.set = true
+    },
+
+    // ############### WEB SOCKETS #####################//
 
     pusherData() {
       const pusher = new Pusher('8643c99a8b00ff38c513', {
@@ -782,9 +1032,9 @@ export default {
             if (sender !== user ) {
               if (post.id === data.post.id){
                 const position = self.posts.indexOf(post)
-                self.posts[position].likes.likes_count = data.post.likes.likes_count
-                // console.log('OLD LIKES :: ' +  self.posts[position].likes.likes_count)
-                // console.log('NEW COUNT ' +  data.post.likes.likes_count)
+                self.posts[position].loveReactant.likes_count = data.post.loveReactant.likes_count
+                // console.log('OLD LIKES :: ' +  self.posts[position].loveReactant.likes_count)
+                // console.log('NEW COUNT ' +  data.post.loveReactant.likes_count)
               }
 
             }
@@ -826,7 +1076,7 @@ export default {
           }
 
           // notification
-          /*            if (data.post.likes.reaction_type === 'Like') {
+          /*            if (data.post.loveReactant.reaction_type === 'Like') {
                         self.$q.notify({
                           message: 'Someone Likes Your Post',
                           color: 'positive',
@@ -868,7 +1118,10 @@ export default {
         wsPort:6001,
         disableStats:true
       });
+
       let self = this
+
+/*
       const commentChannel = window.Echo.channel('comment-channel');
       commentChannel.listen('.App\\Events\\CommentCreatedEvent',
         function (data) {
@@ -888,7 +1141,9 @@ export default {
           }
         }
         );
+      */
 
+/*
       const replyChannel = window.Echo.channel('reply-channel');
       replyChannel.listen('.App\\Events\\ChildCommentCreatedEvent',
         function (data) {
@@ -908,6 +1163,8 @@ export default {
         }
         );
 
+      */
+/*
       const likeChannel = window.Echo.channel('like-channel');
       likeChannel.listen('.App\\Events\\LikeCreatedEvent',
         function (data) {
@@ -921,12 +1178,12 @@ export default {
 
             if (post.id === data.post.id){
               const position = self.posts.indexOf(post)
-              self.posts[position].likes.likes_count = data.post.likes.likes_count
-              // console.log('OLD LIKES :: ' +  self.posts[position].likes.likes_count)
-              // console.log('NEW COUNT ' +  data.post.likes.likes_count)
+              self.posts[position].loveReactant.likes_count = data.post.loveReactant.likes_count
+              // console.log('OLD LIKES :: ' +  self.posts[position].loveReactant.likes_count)
+              // console.log('NEW COUNT ' +  data.post.loveReactant.likes_count)
             }
 
-            if (data.post.likes.reaction_type === 'Like') {
+            if (data.post.loveReactant.reaction_type === 'Like') {
               self.$q.notify({
                 message: 'Someone Likes Your Post',
                 color: 'positive',
@@ -937,7 +1194,7 @@ export default {
                 actions: [
                   { label: 'Dismis',
                     color: 'white',
-                    handler: () => { /* ... */ }
+                    handler: () => { /!* ... *!/ }
                   }
                 ]
               })
@@ -946,7 +1203,9 @@ export default {
           });
         }
         );
+      */
 
+/*
       const reactChannel = window.Echo.channel('react-channel');
       reactChannel.listen('.App\\Events\\CommentReactionEvent',
         function (data) {
@@ -978,27 +1237,9 @@ export default {
                 }
               });
             }
-
-              // notification
-/*            if (data.post.likes.reaction_type === 'Like') {
-              self.$q.notify({
-                message: 'Someone Likes Your Post',
-                color: 'positive',
-                progress: true,
-                count:1,
-                // avatar: '../statics/avat_atem.png',
-                avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
-                actions: [
-                  { label: 'Dismis',
-                    color: 'white',
-                    handler: () => { /!* ... *!/ }
-                  }
-                ]
-              })
-            }*/
-
           });
-
+      */
+/*
       const postChannel = window.Echo.channel('post-channel');
       postChannel.listen('.App\\Events\\PostCreatedEvent',
         function (data) {
@@ -1011,33 +1252,17 @@ export default {
           }
         }
       );
+      */
     },
 
-    // ############## SOCKETS #####################//
-    activateEditComment(comment){
-      return true
-    },
-
-    editComment(comment){
-      this.set = true
-     // console.log(comment)
-    },
-
-  },
-
-  created() {
-    setTimeout(()=>{
-      this.getPosts()
-    }, 200)
+    // ############## END WEB SOCKETS END #####################//
   },
 
   mounted() {
-    if (!this.$auth.user()){
-      if (process.env.API === 'http://localhost:8000/api'){
-        this.pushEcho()
-      }else {
-        this.pusherData()
-      }
+    if (process.env.API === 'http://localhost:8000/api' || 'http://localhost:8090/api'){
+      this.pushEcho()
+    }else {
+      this.pusherData()
     }
   },
 
@@ -1053,5 +1278,11 @@ export default {
 .card-post
   .q-im
     min-height: 200px
+.v-lazy-image
+  filter: blur(10px)
+  transition: filter 0.7s
+.v-lazy-image-loaded
+  filter: blur(0)
+
 </style>
 

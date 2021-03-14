@@ -1,37 +1,5 @@
 <template>
-  <div class="q-pa-md row items-start q-gutter-md" style="max-width: 600px">
-<!--    <template>
-
-      <div class="q-pa-md" style="max-width: 300px">
-        <form @submit.prevent.stop="onSubmit(track, artist)" @reset.prevent.stop="onReset" class="q-gutter-md">
-          <q-input
-            ref="name"
-            filled
-            v-model="artist"
-            label="Artist name *"
-            hint="Soundcloud-user-name"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'example mahaliamusic']"
-          />
-
-          <q-input
-            ref="title"
-            filled
-            v-model="track"
-            label="Song Title *"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'example sober']"
-          />
-
-          <q-toggle v-model="accept" label="I accept the license and terms" />
-
-          <div>
-            <q-btn label="Submit" type="submit" color="primary" />
-            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-          </div>
-        </form>
-      </div>
-    </template>-->
+  <div class="q-pa-md row items-start q-gutter-md" style="max-width: 300px">
 
     <q-card class="my-card" flat bordered>
       <div class="text-overline text-orange-9 q-pa-lg"
@@ -39,15 +7,16 @@
       >{{ modalTitle }}
         <q-input v-if="showSearch" v-model="track" label="search song" stack-label dense @keydown.enter="onSubmit(track,'')"/>
         <template>
-
           <div class="q-pa-md q-gutter-md"
                v-for="(songLink, index) in foundSongs"
           >
+
             <q-btn color="teal" size="sm" :label="songLink" @click="alternative(songLink) ">
 <!--              <q-badge color="blue" floating transparent>
                 5
               </q-badge>-->
             </q-btn>
+
           </div>
         </template>
       </div>
@@ -56,11 +25,19 @@
         :src="song.thumbnail"
         style="width: 100vw; max-width: 350px; opacity: 100;"
       />
-      <div
-        class="q-gutter-x-lg q-pa-lg"
-      >
-        <div>
+      <iframe
+        width="100%"
+        height="166"
+        scrolling="no"
+        frameborder="no"
+        allow="autoplay"
+        style="width: 350px; height: 100px"
+        src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/293&amp;{}"
 
+      >
+      </iframe>
+      <div class="q-gutter-x-lg q-pa-lg">
+        <div>
           <q-media-player
             type="audio"
             background-color="black"
@@ -183,27 +160,27 @@ export default {
         'track': title,
         'artist': artist
       }
-      console.log(data)
-      axios.post('https://api.next-song.app/v1/soundclouds', data)
+
+      const url = "http://localhost:8087/api/v1/soundcloud"
+      axios.post(url, data)
         .then(response => {
           this.track = null
           this.showSearch = false
-          console.log(response.data.results)
-          if (response.data.results.length > 1){
-            this.foundSongs = response.data.results
+         // console.log(response.data.result)
+          if (response.data.result.length > 1){
+            this.foundSongs = response.data.result
             this.alt = true
             this.modalTitle = 'Did you mean'
           }
-          const songLink = response.data.results[0]
+
+          const songLink = response.data.result[0]
           this.getSong(songLink)
+
         })
         .catch(error => {
           console.log(error)
         })
-
         // https://soundcloud.com/tiwasavageofficial/koroba"
-
-
 
      // this.$refs.name.validate()
      // this.$refs.age.validate()
@@ -242,7 +219,7 @@ export default {
       this.$refs.name.resetValidation()
       this.$refs.title.resetValidation()
     },
-    getSong(songLink = this.staticLink){
+    getSong(songLink){
 
       //name = 'mahaliamusic', title = 'sober'
       const url = 'https://soundcloud.com/djatmblack/punjabi-vibes-atm-rmxmp3'
@@ -260,10 +237,12 @@ export default {
       const mahalia = 'https://soundcloud.com/mahaliamusic/sober-acoustic'
 
 
-    //  const songLink = "https://soundcloud.com/"+name+"/"+title
+      if (songLink === ''){
+        //songLink = "https://soundcloud.com/"+name+"/"+title
+      //  songLink = this.staticLink
+      }
 
-      console.log(songLink)
-
+    //  songLink = this.staticLink
 
       const SoundCloud = require("soundcloud-scraper");
       const client = new SoundCloud.Client();
@@ -273,7 +252,7 @@ export default {
         .then(song => {
           this.song = song
           this.showSearch = false
-          console.log(this.song)
+         // console.log(this.song)
 
         })
         .catch(console.error);

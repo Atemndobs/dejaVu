@@ -111,6 +111,28 @@
           dense
           flat
         />-->
+
+        <q-btn
+          class="q-mr-sm"
+          to="/settings"
+          icon="settings"
+          round
+          text-color="black"
+          size="15px"
+          dense
+          flat
+        />
+
+        <q-btn
+          to="/video"
+          icon="eva-video-outline"
+          round
+          text-color="black"
+          size="13px"
+          dense
+          flat
+        />
+
         <q-btn
           to="/audio"
           icon="eva-headphones-outline"
@@ -118,6 +140,7 @@
           text-color="black"
           size="13px"
           dense
+          flat
         />
         <q-separator
           class="large-screen-only"
@@ -366,6 +389,23 @@
 let deferredPrompt;
 
 window.Pusher = require('pusher-js');
+
+import VueDarkMode from "@growthbunker/vuedarkmode";
+
+Vue.use(VueDarkMode, {
+  // Specify the theme to use: dark or light (dark by default).
+  theme: "dark",
+
+  // Specify the components to declare globally in your project
+  // When undefined, null or given an empty array, all components will be imported
+  components: [
+    // Base components
+    "alert", "avatar", "badge", "button", "divider", "heading", "icon",  "progress-bar",  "spinner",
+
+    // Field components
+    "checkbox", "file", "image-uploader", "input", "input-numeric", "label", "message", "radios", "select", "tabs", "textarea", "toggle"
+  ]
+});
 
 export default {
   name: 'MainLayout',

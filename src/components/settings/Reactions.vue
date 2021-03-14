@@ -1,7 +1,10 @@
 <template>
   <div class="q-pa-md" >
-    <q-badge outline color="teal">
+    <q-badge outline color="teal" v-if="reactions.length > 0">
       Existing Reactions: {{reactions}}
+    </q-badge>
+    <q-badge outline color="teal" v-else>
+      Please add reaction type
     </q-badge>
 <!--    <q-item-section   v-for="(reaction, index) in reactions">
     </q-item-section>-->

@@ -15,7 +15,7 @@
               to="/login"
               class="text-grey-6"
             >
-              Preceed to login
+              Proceed to login
             </q-btn>
           </div>
           <div class="form-group" v-else>

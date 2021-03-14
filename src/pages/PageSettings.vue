@@ -16,6 +16,12 @@
     </q-item-section>
 
 
+    <!--- Reset Database--->
+    <q-item-section >
+      <ResetDb/>
+    </q-item-section>
+
+
   </div>
 
 </template>
@@ -25,10 +31,11 @@ import axios from "axios";
 import Populate from "../components/settings/Populate";
 import Clear from "../components/settings/Clear";
 import Reactions from "../components/settings/Reactions";
+import ResetDb from "../components/settings/ResetDb";
 
 export default {
   name: "PageSettings",
-  components: {Reactions, Clear, Populate},
+  components: {ResetDb, Reactions, Clear, Populate},
   data () {
     return {
       model: null,

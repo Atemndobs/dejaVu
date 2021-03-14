@@ -25,6 +25,7 @@
           </template>
         </q-media-player>-->
 
+    <Soundcloud class="q-pa-lg"/>
     <div
       class="q-gutter-x-lg q-pa-lg"
       v-if="!loadingSongs && songs.length">
@@ -39,7 +40,7 @@
           :sources="this.audio.sources"
           @ended="onEnded"
           ref="myAudio"
-          id="track"
+
           style="max-width: 600px"
           radius="0rem"
           dense
@@ -67,19 +68,15 @@
       <q-btn label="Analyse" :icon-right="ionPulse" color="purple" @click="upload"></q-btn>
     </div>
     <div
+      style="max-width: 350px"
       class="q-gutter-x-lg q-pa-lg q-mt-lg-lg"
       v-else-if="loadingSongs && !songs.length">
-
       <h5 class="text-center text-grey">
         No Songs Uploaded Yet...
       </h5>
     </div>
 
-
-
-
     <div class="q-gutter-x-lg q-pa-lg">
-
       <div >
         <q-uploader
           url="https://api.next-song.app/v1/songs"
@@ -87,16 +84,17 @@
           max-files="100"
           multiple
           batch
-          style="max-width: 600px"
+          style="max-width: 350px"
           max-total-size="2147483648"
           @rejected="onRejected"
           bordered
           :factory="factoryFn"
           @click.prevent="upload"
+
         />
       </div>
     </div>
-    <Soundcloud class="q-pa-lg"/>
+
   </div>
 
 
@@ -127,19 +125,6 @@ export default {
         muted:true,
         play:false,
         next:false,
-        video: {
-          label: 'Song from Song API',
-          poster: '',
-          sources: [
-            {
-              src: 'http://ftp.nluug.nl/pub/graphics/blender/demo/movies/ToS/tears_of_steel_720p.mov',
-              type: 'video/mp4'
-            }
-          ],
-          tracks: [
-
-          ]
-        },
         audio: {
           sources: [
             {
@@ -156,7 +141,7 @@ export default {
     this.mdiAbTesting = mdiAbTesting
     this.fasFont = fasFont
     this.ionPulse = ionPulseSharp
-    this.getAudio()
+  // this.getAudio()
     // console.log('AUDIO SOURCES::')
     // this.audio.sources = this.sources
     // console.log(this.audio.sources)
@@ -236,11 +221,9 @@ export default {
         // simulating a delay of 2 seconds
         this.getAudio()
         files = ''
-        setTimeout(() => {
-          resolve({
-            url: 'https://api.next-song.app/v1/songs'
-          })
-        }, 100)
+        resolve({
+          url: 'https://api.next-song.app/v1/songs'
+        })
       })
     },
 

@@ -15,6 +15,7 @@
      />
 
    </div>
+   <q-btn label="Upload" @click="showUpload = true"/>
    <div class="text-center q-pa-md">
      <q-btn
         @click="captureImage"
@@ -46,9 +47,18 @@
       <template v-slot:prepend>
         <q-icon name="eva-attach-outline" />
       </template>
+
     </q-file>
 
    </div>
+   <q-file
+     v-show="showUpload"
+     outlined
+     v-model="imageUpload"
+     label="Chose an image"
+     accept="image/*"
+     @input="captureImageFallback"
+   />
 
    <div class="row justify-center q-ma-md">
      <q-input
@@ -90,6 +100,7 @@
         rounded
         unelevated
       />
+
     </div>
 
   </q-page>
@@ -112,13 +123,14 @@ export default {
           date: Date.now(),
           imageId:'',
           imageUrl: '',
-          userId:''
+          userId:'',
         },
         imageCaptured : false,
         imageUpload: [],
         hasCameraSupport: true,
         locationLoading: false,
-        showCamera: true
+        showCamera: true,
+        showUpload:false
 
       }
     },

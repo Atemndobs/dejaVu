@@ -14,9 +14,21 @@
         class="q-gutter-md"
         @submit="onSubmit"
       >
-        {{data.users}}
+        <template>
+          <div class="q-pa-md" style="max-width: 300px">
+            <div class="q-gutter-md">
+              <q-select
+                v-model.trim="data.body.email"
+                :options="options"
+                :label="lang.auth.fields.email"
+                :rules="validations['email']"
+              />
+
+            </div>
+          </div>
+        </template>
         <q-card-section>
-          <q-input
+<!--          <q-input
             v-if="identifierField === 'email'"
             id="email"
             v-model.trim="data.body.email"
@@ -25,7 +37,7 @@
             :rules="validations['email']"
             lazy-rules
             autofocus
-          />
+          />-->
           <q-input
             id="password"
             v-model="data.body.password"
@@ -95,6 +107,7 @@ export default {
   data () {
     return {
       page: 'login',
+      options:[],
       lang: {
         auth: {}
       },
@@ -222,6 +235,7 @@ export default {
           // console.log(response)
           Object.entries(response.data.data).forEach(([key, user]) => {
             this.data.users.push(user.email)
+            this.options.push(user.email)
           });
         }).catch(error => {
         console.log(error)

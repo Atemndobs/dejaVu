@@ -20,7 +20,9 @@ export default {
       cancel: this.lang.auth.logout.cancel
     }).onOk(() => {
       this.$auth.logout().then(() => {
+        this.$q.localStorage.clear()
         this.$router.replace('/')
+        window.location.reload();
       })
     }).onCancel(() => {
       this.$router.go(-1)

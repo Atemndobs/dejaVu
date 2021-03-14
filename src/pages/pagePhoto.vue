@@ -14,7 +14,6 @@
           label="Get Picture"
           @click="captureImage"
         />
-        <img :src="imageSrc">
       </q-card-section>
     </q-card>
   </div>

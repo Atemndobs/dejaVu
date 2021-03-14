@@ -27,8 +27,8 @@ export default {
   name: "Populate",
   data () {
     return {
-      model: null,
-      color:'secondary',
+      model: 'posts',
+      color:'blue',
       options: [],
       loading1: false,
       percentage1: 0,
@@ -73,11 +73,8 @@ export default {
 
       axios.post(apiUrl)
         .then(response => {
-         // console.log(' RESPONSE ::')
-         // console.log(response.data)
-          // Handle Code here
           this.model = response.data.message
-          this.color = 'red'
+          this.color = 'teal'
 
           this[`percentage${id}`] = 100
           this[`loading${id}`] = false

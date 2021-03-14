@@ -17,6 +17,7 @@ const routes: RouteConfig[] = [
 
 
       { path: '/audio', component: () => import('pages/PageAudio.vue') },
+      { path: '/video', component: () => import('pages/PageVideo.vue') },
       { path: '/login', component: () => import('pages/auth/login.vue') },
       { path: '/logout', component: () => import('pages/auth/Logout.vue') },
       { path: '/register', component: () => import('pages/auth/register.vue') },
