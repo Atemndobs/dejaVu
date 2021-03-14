@@ -1260,9 +1260,9 @@ export default {
 
   mounted() {
     if (process.env.API === 'http://localhost:8000/api' || 'http://localhost:8090/api'){
-      this.pushEcho()
+     // this.pushEcho()
     }else {
-      this.pusherData()
+    //  this.pusherData()
     }
   },
 
