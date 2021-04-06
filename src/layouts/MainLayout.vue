@@ -15,6 +15,26 @@
           size="18px"
           dense
         />
+
+        <q-btn
+          to="/weather/forecast"
+          icon="eva-sun-outline"
+          round
+          text-color="black"
+          size="13px"
+          dense
+          flat
+        />
+
+        <q-btn
+          to="/price"
+          icon="eva-bell-outline"
+          round
+          text-color="black"
+          size="13px"
+          dense
+          flat
+        />
        <q-separator
           class="large-screen-only"
           vertical
@@ -132,6 +152,15 @@
           dense
           flat
         />
+        <q-btn
+          to="/stream"
+          icon="eva-tv"
+          round
+          text-color="black"
+          size="13px"
+          dense
+          flat
+        />
 
         <q-btn
           to="/audio"
@@ -206,7 +235,7 @@
           </q-item-section>
         </q-item>
 
-        <!-- DArk Mod is not working Properly -->
+        <!-- Dark Mod is not working Properly -->
 <!--        <q-item>
           &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45; Dark mode activations-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
           &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;    :icon="$q.dark.isActive ? 'eva-settings' : 'eva-settings-outline'"  &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
@@ -386,11 +415,15 @@
 </template>
 
 <script >
+import axios from "axios";
+
 let deferredPrompt;
 
 window.Pusher = require('pusher-js');
 
-import VueDarkMode from "@growthbunker/vuedarkmode";
+import Echo from 'laravel-echo'
+
+/*import VueDarkMode from "@growthbunker/vuedarkmode";
 
 Vue.use(VueDarkMode, {
   // Specify the theme to use: dark or light (dark by default).
@@ -405,7 +438,7 @@ Vue.use(VueDarkMode, {
     // Field components
     "checkbox", "file", "image-uploader", "input", "input-numeric", "label", "message", "radios", "select", "tabs", "textarea", "toggle"
   ]
-});
+});*/
 
 export default {
   name: 'MainLayout',
@@ -414,12 +447,12 @@ export default {
       loggedInUser:'atem',
       showAppInstallBanner: false,
       fabPos: [ 18, 18 ],
-      draggingFab: false
+      draggingFab: false,
+      query:''
     }
   },
   mounted() {
     let neverShowAppInstall = this.$q.localStorage.getItem('neverShowAppInstall')
-
     if (!neverShowAppInstall) {
       window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent the mini-infobar from appearing on mobile
@@ -434,7 +467,8 @@ export default {
       });
     }
 
-
+    this.pushEcho()
+  //  this.getForecast()
   },
   methods: {
     installApp() {
@@ -464,7 +498,116 @@ export default {
         this.fabPos[0] - ev.delta.x,
         this.fabPos[1] - ev.delta.y
       ]
-    }
+    },
+
+    getForecast () {
+      let city = this.query===''?'Dusseldorf':this.query
+      //     let apiUrl = `${this.url_base}weather?q=${city}&units=metric&APPID=${this.api_key}`
+      let apiUrl = process.env.API+'/weather/forecast/'+city
+
+
+      axios.get(apiUrl)
+        .then(response => {
+          let temp = response.data.current.temp
+
+          console.log(response)
+          if ( temp >= 13){
+            let message = `The temperature in ${city} now is ${temp} °C`
+            this.showNotif(message, 'positive')
+          }
+        }).catch(error => {
+        let message = `Please enter a valid City not ${city}`
+        this.showNotif(message, 'red')
+        console.log(`Wrong City :  ${city}`)
+        console.log(`Error:  ${error}`)
+      })
+
+      this.query = ''
+    },
+
+    showNotif (message , color) {
+      this.$q.notify({
+        message: message,
+        color: color,
+        progress: true,
+        position: 'top',
+        count:1,
+        avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
+        actions: [
+          { label: 'Dismis',
+            color: 'white',
+            handler: () => { /!* ... *!/ }
+          }
+        ]
+      })
+    },
+
+
+
+    pushEcho(){
+      window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: 'local',
+        cluster: 'local',
+        forceTLS: false,
+        // wsHost:'127.0.0.1',
+        wsHost:window.location.hostname,
+        wsPort:6001,
+        disableStats:true
+      });
+
+      let self = this
+
+      const weatherChannel = window.Echo.channel('weather-channel');
+      weatherChannel.listen('.App\\Events\\WeatherFetchEvent',
+        function (data) {
+          JSON.stringify(data)
+
+        }
+      );
+
+      const forecastChannel = window.Echo.channel('forecast-channel');
+      forecastChannel.listen('.App\\Events\\ForecastUpdatedEvent',
+        function (data) {
+          JSON.stringify(data)
+
+          let city = data.forecast.timezone
+          let temp = data.forecast.current.temp
+          let message = `The forecast for  ${city} is ${temp} °C`
+          self.showNotif(message, 'positive')
+        }
+      );
+
+
+      const peakChannel = window.Echo.channel('peak-channel');
+      peakChannel.listen('.App\\Events\\PeakTemperatureEvent',
+        function (data) {
+          JSON.stringify(data)
+          console.log(data)
+
+          let city = 'Dusseldorf'
+          let temp = data.peak
+          self.$store.commit('forecasts/setDusseldorf', {peak:temp})
+          let message = `Today's peak temperature of ${temp}°C in ${city} has been reached`
+          self.showNotif(message, 'teal')
+        }
+      );
+
+
+      const priceChannel = window.Echo.channel('price-channel');
+      priceChannel.listen('.App\\Events\\PriceCheckEvent',
+        function (data) {
+          JSON.stringify(data)
+          const {article, details} = {...data}
+
+         // self.$store.commit('forecasts/setDusseldorf', {peak:temp})
+          let message = `The current Price of ${article} is ${details.price},
+          specs:  ${details.spec}, color: ${details.color}, condition: ${details.condition}`
+          self.showNotif(message, 'teal')
+        }
+      );
+
+    },
   },
   computed: {
     toggleDark: {

@@ -108,6 +108,7 @@
 
 <script >
 import { uid } from 'quasar'
+import axios from "axios";
 import { error } from 'util';
 require('md-gum-polyfill');
 
@@ -231,10 +232,27 @@ export default {
       getLocation() {
         this.locationLoading = true;
         navigator.geolocation.getCurrentPosition(position => {
-          this.getCityAndCountry(position)
+          try {
+            this.getPixelateLocation(position)
+          }catch (error ){
+           // this.getCityAndCountry(position)
+          }
+
         }, error => {
            this.locationError();
         }, {timeout: 7000})
+      },
+
+      async getPixelateLocation(position){
+        let data = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        }
+        await axios.post(`${process.env.API}/weather/location`, data)
+        .then(result => {
+
+          this.locationSuccesss(result)
+        })
       },
 
       getCityAndCountry(position) {
@@ -382,10 +400,9 @@ export default {
           return
         }
 
-        let userId = this.$auth.user().id
-        // for submitting post as design Use snippet below
-       // this.$axios.post(`${process.env.API}/posts/${this.user_id}`, data)
-                this.$axios.post(`${process.env.API}/posts/${userId}`, data)
+      //  let userId = this.$auth.user().id
+
+                this.$axios.post(`${process.env.API}/posts`, data)
                   .then(response => {
 
                   console.log('SUBMITTED POST :: => ')

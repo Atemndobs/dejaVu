@@ -13,3 +13,5 @@ export function addLoginCallback (state, data) {
 export function setUserData (state, data) {
   state.userData = data
 }
+
+

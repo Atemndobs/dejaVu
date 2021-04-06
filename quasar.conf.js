@@ -11,6 +11,8 @@ const { configure } = require('quasar/wrappers');
  API_LOCAL = 'http://127.0.0.1:8000/api'
  API_DOCKER = 'http://localhost:8090/api'
  API_VALET = 'https://pixelate.app/api'
+ API_VIDEO = 'http://localhost:8012/api/v1/'
+ API_USERS = 'http://localhost:8011/api/V1/' //double-check the endpoint again
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -51,10 +53,9 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API:API_PRODUCTION
-       // API:API_DOCKER
-         // ? 'https://dev.' + process.env.API_LOCAL
-         // : 'https://prod.' + process.env.API_PROD
+        API:API_DOCKER,
+        // API:API_PRODUCTION
+        VIDEO:API_VIDEO
 
       },
       vueRouterMode: 'hash', // available values: 'hash', 'history'

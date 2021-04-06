@@ -22,6 +22,13 @@
     </q-item-section>
 
 
+
+    <!--- Forecast --->
+    <q-item-section >
+      <Forecast/>
+    </q-item-section>
+
+
   </div>
 
 </template>
@@ -32,10 +39,11 @@ import Populate from "../components/settings/Populate";
 import Clear from "../components/settings/Clear";
 import Reactions from "../components/settings/Reactions";
 import ResetDb from "../components/settings/ResetDb";
+import Forecast from "../components/settings/Forecast";
 
 export default {
   name: "PageSettings",
-  components: {ResetDb, Reactions, Clear, Populate},
+  components: {Forecast, ResetDb, Reactions, Clear, Populate},
   data () {
     return {
       model: null,

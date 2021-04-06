@@ -1,5 +1,15 @@
 <template>
   <div>
+
+    <q-btn label="Stream" @click="startStream"/>
+    <!-- Vissues begin here-->
+<!--    <template>
+      <Vssue
+        :title="title"
+        :options="options"
+      />
+    </template>-->
+
     <q-page class="constrain q-pa-md">
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-sm-8">
@@ -11,7 +21,7 @@
                 class="card-post q-mb-md"
                 flat
               >
-
+<!--                {{post.user.email}}-->
                 <q-item>
                   <q-item-section avatar>
                     <q-avatar>
@@ -61,6 +71,7 @@
                         >
                           <q-item dense clickable v-ripple active="active" active-class="text-blue">
                             <q-icon
+                              v-show="$auth.check() && $auth.user().id !== post.user.id"
                               :name="post.is_user_following?'eva-person-add':'eva-person-add-outline'"
                               color="blue"
                               size="18px"
@@ -69,8 +80,9 @@
                               padding="xs"
                               flat
                             />
-                            {{post.is_user_following?'following':'follow'}}
-
+                            <div v-show="$auth.check() && $auth.user().id !== post.user.id">
+                              {{post.is_user_following === true? 'following':'follow'}}
+                            </div>
                             <q-space/>
                             <q-icon
                               :name="post.user.follower_count === 0?'eva-people-outline':'eva-people'"
@@ -83,17 +95,16 @@
                             />
                             {{post.user.follower_count === 0?'':post.user.follower_count}}
 
-
                           </q-item>
                         </q-item-section>
                         <!-------------- Follow Ends _--------------->
 
                         <q-space/>
 
-                        <!---------Like Section Start ------------->
+                        <!---------Like Section Start     post.loveReactant.icon_class ------------->
                         <q-icon
-                          :name="post.loveReactant.icon_class"
-                          :color="post.is_liked? 'red' : 'black'"
+                          :name="post.is_liked ? 'eva-heart':'eva-heart-outline'"
+                          :color="post.is_liked ? 'red' : 'black'"
                           size="20px"
                           @click="submitLike(post)"
                           rounded
@@ -435,9 +446,8 @@
                 <q-item-label caption class="text-teal-9 q-pa-xs">
                   {{this.$auth.user()?this.$auth.user().tagline:''}}
                 </q-item-label>
-
                 <q-item-label caption class="text-blue-9 q-pa-xs">
-                  Followers : {{this.$auth.user()?this.$auth.user().followers.length:''}}
+                  Followers : {{this.$auth.user()?this.$auth.user().follower_count:''}}
                 </q-item-label>
 
                 <q-item-label caption class="text-blue-9 q-pa-xs">
@@ -457,28 +467,6 @@
       </div>
     </q-page>
 
-    <!-- PAGINATION -->
-<!--    <div class="card-footer pb-0 pt-3 q-pa-xl" >
-      <q-pagination
-        input
-        input-class="text-orange-10"
-
-        v-model="current"
-        :max="totalPages"
-        :direction-links="true"
-        :boundary-links="true"
-        :max-pages="6"
-        dark
-        :boundary-numbers="true"
-        icon-first="skip_previous"
-        icon-last="skip_next"
-        icon-prev="fast_rewind"
-        icon-next="fast_forward"
-        @click="nextPage"
-      >
-      </q-pagination>
-    </div>-->
-    <!-- Infinite Scroll -->
     <infinite-loading @infinite="infiniteHandler" spinner="bubbles" >
 
       <div slot="no-more">
@@ -500,6 +488,7 @@
 </template>
 
 <script>
+
 import {date} from 'quasar'
 import axios from "axios";
 import Echo from 'laravel-echo'
@@ -507,15 +496,49 @@ import { emojiIndex } from 'emoji-mart-vue'
 import { emojis } from 'emoji-mart-vue'
 import InfiniteLoading from 'vue-infinite-loading';
 import VueEmojiReact from 'vue-emoji-react'
+import { VLazyImagePlugin } from "v-lazy-image";
+import { Picker } from 'emoji-mart-vue'
+
+// import vssue
+import Vssue from 'vssue'
+import GithubV3 from '@vssue/api-github-v3'
+import 'vssue/dist/vssue.css'
+import {mapActions, mapGetters, mapState} from "vuex";
 
 import Vue from "vue";
-import { VLazyImagePlugin } from "v-lazy-image";
-
 Vue.use(VLazyImagePlugin);
 Vue.component('VueEmojiReact', VueEmojiReact);
+Vue.use(Vssue, {
+  api: GithubV3,
+  // here set the default options for your OAuth App
+  owner: 'Atemndobs',
+  repo: 'deja-vu',
+  clientId: 'bab01518791732be829c',
+  clientSecret: '60bf90e7476c7ad1366b22a8e0fc9ab9d869ac26', // only required for some of the platforms
+})
 
 
-import { Picker } from 'emoji-mart-vue'
+function notification(postData) {
+
+  if ( postData.author === postData.userId) {
+    postData.self.$q.notify({
+      message: postData.message,
+      color: 'positive',
+      progress: true,
+      count: 1,
+      avatar: postData.avatar,
+      //avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
+      actions: [
+        {
+          label: 'Dismis',
+          color: 'white',
+          handler: () => { /* ... */
+          }
+        }
+      ]
+    })
+  }
+}
 
 export default {
   name: 'Page',
@@ -523,6 +546,7 @@ export default {
     Picker,
     VLazyImagePlugin,
     InfiniteLoading,
+   // VssueComponent,
 
   },
 
@@ -539,10 +563,9 @@ export default {
       cars:[],
       activeInput:false,
       activateAddComment:false,
-   //   current: 1,
-    //  totalPages:5,
       page: 1,
       tada:'',
+      postReacting:{},
       emojis : [
         {
           name: 'rage',
@@ -560,7 +583,18 @@ export default {
           name: 'grinning',
           count: 2
         }
-      ]
+      ],
+      // here set the title of issue of current page
+      title: 'Vissue Title Slot',
+
+      // notice that, the options here will override the default options set by `Vue.use()` above
+      // if you do not want to change them, just set the `title` prop, and ignore the `options` prop
+      options: {
+        // owner: 'OWNER_OF_REPO',
+        // repo: 'NAME_OF_REPO',
+        // clientId: 'YOUR_CLIENT_ID',
+        // clientSecret: 'YOUR_CLIENT_SECRET', // only required for some of the platforms
+      },
     }
   },
   filters: {
@@ -573,6 +607,7 @@ export default {
     }
   },
   methods: {
+
     infiniteHandler($state) {
       this.loadingPosts = true;
       let limit = 10;
@@ -592,7 +627,6 @@ export default {
 
           const Emoji = require('emoji-store');
           this.tada = Emoji.get('tada')
-          console.log('TADA', this.tada );
         }
       })
         .catch(error => {
@@ -617,98 +651,8 @@ export default {
       return Emoji.get(type)
     },
 
-    addEmoji(){
-      return {
-        id: 'smile',
-        name: 'Smiling Face with Open Mouth',
-        colons: ':smiley:',
-        text: ':)',
-        emoticons: [
-          '=)',
-          '=-)'
-        ],
-        skin: null,
-        native: '😃'
-      }
-    },
-
-/*    getPosts(page = this.current, $state) {
-      this.loadingPosts = true;
-      let limit = 1;
-      let  user_id = this.$auth.check()? this.$auth.user().id : 1
-      let url = `${process.env.API}/posts?user_id=${user_id}&page=${page}&perPage=${limit}`
-
-      this.$axios.get(url).then(response => {
-        this.posts.unshift(...response.data.data.reverse());
-
-        if (response.data.data.length) {
-        //  this.page += 1;
-          this.posts.unshift(...response.data.data.reverse());
-          $state.loaded();
-        } else {
-          $state.complete();
-        }
-
-        //this.posts= response.data.data.reverse()
-        this.totalPages = response.data.pagination.totalPages
-       // console.log(response.data.pagination)
-
-
-        /!**
-
-         let follow = { "is_user_following": false, "follower_count": 0, "following_count": 0 }
-         for (let i = 0; i < this.posts.length; i++) {
-          this.posts[i].user.follow = response.data.data[i].user.follow?response.data.data[i].user.follow:follow
-          this.posts[i].comments = response.data.data[i].comments.reverse()
-
-          console.log( this.posts[i])
-
-        //  console.log(this.posts[i].comments )
-          for (var j = 0; j < this.posts[i].comments.length ; j++){
-            this.posts[i].comments[j].childComments = response.data.data[i].comments[j].childComments.reverse()
-          }
-
-          const reactions = response.data.data[i].reactions
-          const result = Object.keys(reactions).map(function(key) {
-            return  reactions[key];
-          });
-
-          if (this.$auth.check()){
-            let existing_reaction = result.find(
-              o => o.reacter_id === this.$auth.user().id
-                && o.reactant_id === response.data.data[i].id
-            );
-            if (existing_reaction){
-              this.posts[i].loveReactant.icon_class = 'eva-heart'
-              this.posts[i].loveReactant.is_liked = true
-            }
-          }
-
-
-        }
-         *!/
-        this.loadingPosts = false;
-
-      })
-      .catch(error => {
-        console.log(error)
-        if (process.env.API){
-          this.$q.dialog({
-            title: 'Error',
-            message: 'Oops something went wrong, pls contact Atem'
-          })
-        }else {
-          this.$q.dialog({
-            title: 'Error',
-            message: error.message
-          })
-        }
-        this.loadingPosts = false;
-      })
-    },*/
-
     submitLike(post){
-
+      this.reactedPost(post)
       if (!this.$auth.check()){
         this.$q.dialog({ 'message' : "You need to Login Before you can Like" })
         this.$router.push('/login')
@@ -723,33 +667,25 @@ export default {
       let data = {
         user_id:userId,
         type:'Like',
+        position :this.posts.indexOf(post)
       }
 
-     // console.log(data)
       axios.post(apiUrl, data)
         .then(response => {
-
-          console.log(' RESPONSE FROM USERa ::')
-
-         // console.log(response.data.data)
+//          console.log(' RESPONSE FROM USERa ::')
           const position = this.posts.indexOf(post)
-
           const reaction_type = response.data.data.reaction_type
-          if (reaction_type === data.type) {
 
-            this.posts[position].loveReactant.icon_class = 'eva-heart'
+          if (reaction_type === data.type) {
+           // this.posts[position].loveReactant.icon_class = 'eva-heart'
             this.posts[position].is_liked = true
             this.posts[position].likes_count = response.data.data.likes_count
           }else {
-            this.posts[position].loveReactant.icon_class = 'eva-heart-outline'
+           // this.posts[position].loveReactant.icon_class = 'eva-heart-outline'
             this.posts[position].is_liked = false
             this.posts[position].likes_count = response.data.data.likes_count
-         //   this.reactionType = 'eva-heart-outline'
-
           }
-
-          this.posts[position].loveReactant.likes_count = response.data.loveReactant.likes_count
-
+          this.posts[position].loveReactant.likes_count = response.data.likes_count
 
       }).catch(error => {
         console.log(error)
@@ -822,22 +758,23 @@ export default {
         user_id:userId,
         comment: comment,
         post:post.id,
+        position :this.posts.indexOf(post)
       }
 
 
       axios.post(apiUrl, data)
         .then(response => {
-          const position = this.posts.indexOf(post)
+          const position = data.position
           const currentPost = this.posts[position]
           currentPost.comments_count = response.data.data['comment_count']
           currentPost.new_comment = response.data.data.comment['comment']
 
-          console.log('RESPONSE')
+/*          console.log('RESPONSE')
           console.log(response.data.data)
           console.log('RESPONSE ENd')
           console.log('POST  ===================')
           console.log(currentPost.comments)
-          console.log('POST  END  ===================')
+          console.log('POST  END  ===================')*/
 
 
           let newComment = {
@@ -934,19 +871,15 @@ export default {
 
       const apiUrl = process.env.API+"/user/follow/"+authorId
       let data = {
-        'author_id': authorId
+        author_id: authorId,
+        position :this.posts.indexOf(post)
       }
       axios.post(apiUrl, data)
         .then(response => {
 
-          console.log(' RESPONSE ::')
-          console.log(response.data)
-
-          const position = this.posts.indexOf(post)
-          this.posts[position].user.follow = response.data
-          this.posts[position].user.follower_count = response.data.follower_count
-          this.$auth.user().follower_count = response.data.follower_count
-          this.$auth.user().following_count = response.data.following_count
+           post.is_user_following = response.data.is_user_following
+           post.user.follower_count = response.data.follower_count
+          this.$store.commit('auth/setUserFollowingCount', response.data.user_following_count)
 
         }).catch(error => {
         console.log(error)
@@ -967,9 +900,32 @@ export default {
       this.set = true
     },
 
+    reactedPost(post){
+      this.postReacting = post
+    },
+
+    startStream(){
+      let  videoUrl = process.env.VIDEO
+
+      let data = {
+        'signal_data' : 'signal from the vue application'
+      }
+
+      axios.post(videoUrl+'video/call', data)
+        .then(response => {
+
+          console.log(' RESPONSE FROM VIDEO API ::')
+           console.log(response)
+          console.log('VIDEO API :: END')
+
+        }).catch(error => {
+        console.log(error)
+      })
+    },
+
     // ############### WEB SOCKETS #####################//
 
-    pusherData() {
+/*    pusherData() {
       const pusher = new Pusher('8643c99a8b00ff38c513', {
         cluster: 'eu'
       });
@@ -1076,7 +1032,7 @@ export default {
           }
 
           // notification
-          /*            if (data.post.loveReactant.reaction_type === 'Like') {
+          /!*            if (data.post.loveReactant.reaction_type === 'Like') {
                         self.$q.notify({
                           message: 'Someone Likes Your Post',
                           color: 'positive',
@@ -1091,7 +1047,7 @@ export default {
                             }
                           ]
                         })
-                      }*/
+                      }*!/
 
         }
       );
@@ -1105,7 +1061,7 @@ export default {
           }
         }
       );
-    },
+    },*/
 
     pushEcho(){
       window.Echo = new Echo({
@@ -1121,29 +1077,123 @@ export default {
 
       let self = this
 
-/*
       const commentChannel = window.Echo.channel('comment-channel');
       commentChannel.listen('.App\\Events\\CommentCreatedEvent',
         function (data) {
           JSON.stringify(data)
-          let sender = parseInt(data.new_comment.commenter_id)
-          let user = parseInt(self.$auth.user().id)
-          console.log(user)
-          console.log(sender)
-          if (user !== sender){
-            Object.entries(self.posts).forEach(([key, post]) => {
-              if (post.id === data.post_id){
-                post.comments_count = data.comments_count
-                post.new_comment = data.new_comment
-                post.comments.unshift(data.new_comment)
-              }
-            });
+          let sender = parseInt(data.comment.commenter.id)
+          let userId = parseInt(self.$auth.user().id)
+          let post = self.posts[data.position]
+
+
+          let newComment = {
+            id: data.comment.id,
+            comment:data.comment.comment,
+            commenter: {
+              name:data.comment.commenter.name,
+              photo_url:data.comment.commenter.avatar,
+            },
+            childComments:{},
+            parent:{},
+            reaction_count: '',
+            reactions: '',
+            updated_dates:data.updated_dates,
+            created_dates:data.created_dates,
+
+          }
+
+          if (userId !== sender){
+            post.comments.unshift(newComment)
+            post.comments_count = data.comments_count
+            self.posts[data.position].new_comment = data.comment.comment
+          }
+
+          let postData = {
+            message : `${data.comment.commenter.name} says: ${data.comment.comment}`,
+            avatar : data.comment.commenter.avatar,
+            author : data.author,
+            userId : userId,
+            self:self
+          }
+          notification(postData)
+        }
+        );
+
+
+      const likeChannel = window.Echo.channel(`like-channel-post`);
+      likeChannel.listen('.App\\Events\\LikeCreatedEvent',
+        function (data) {
+          JSON.stringify(data)
+          let post = self.posts[data.post.position]
+          let userId = parseInt(self.$auth.user().id)
+
+          if (data.post.reacter.id !== userId){
+           // console.log('THHIS GUY SHOULD BE UPDATED')
+            post.likes_count = data.post.likes.likes_count
+          }
+
+          if (data.post.is_liked){
+            let postData = {
+              message : `${data.post.reacter.name} Likes Your Post`,
+              avatar : data.post.reacter.avatar,
+              author : data.post.author,
+              userId : userId,
+              self:self
+            }
+            notification(postData);
           }
         }
         );
-      */
 
-/*
+
+      const followChannel = window.Echo.channel('follow-channel');
+      followChannel.listen('.App\\Events\\FollowCreatedEvent',
+        function (data) {
+          JSON.stringify(data)
+          let userId = parseInt(self.$auth.user().id)
+          let author = data.author.id
+
+          let post = self.posts[data.position]
+          post.user.follower_count = data.author.follower_count
+          if (userId === author){
+            self.$store.commit('auth/setUserFollowerCount', data.author.follower_count)
+          }
+
+          if (data.is_user_following){
+            let postData = {
+              message :`New Follower :  ${data.user.name} `,
+              avatar : data.user.avatar,
+              author : author,
+              userId : userId,
+              self:self
+            }
+            notification(postData);
+          }
+
+        }
+        );
+
+      const videoChannel = window.Echo.channel('video-channel');
+      videoChannel.listen('.App\\Events\\StartVideoChat',
+        function (data) {
+          JSON.stringify(data)
+          console.log(data)
+
+          if (data.is_user_following){
+            let postData = {
+              message :`New Follower :  ${data.user.name} `,
+              avatar : data.user.avatar,
+              author : author,
+           //   userId : userId,
+              self:self
+            }
+            notification(postData);
+          }
+
+        }
+        );
+
+      /*
       const replyChannel = window.Echo.channel('reply-channel');
       replyChannel.listen('.App\\Events\\ChildCommentCreatedEvent',
         function (data) {
@@ -1164,47 +1214,6 @@ export default {
         );
 
       */
-/*
-      const likeChannel = window.Echo.channel('like-channel');
-      likeChannel.listen('.App\\Events\\LikeCreatedEvent',
-        function (data) {
-          JSON.stringify(data)
-        //  console.log('LIKE CHANNEL')
-
-          Object.entries(self.posts).forEach(([key, post]) => {
-
-            let sender = parseInt(data.post.reacter_id)
-            let user = parseInt(self.$auth.user().id)
-
-            if (post.id === data.post.id){
-              const position = self.posts.indexOf(post)
-              self.posts[position].loveReactant.likes_count = data.post.loveReactant.likes_count
-              // console.log('OLD LIKES :: ' +  self.posts[position].loveReactant.likes_count)
-              // console.log('NEW COUNT ' +  data.post.loveReactant.likes_count)
-            }
-
-            if (data.post.loveReactant.reaction_type === 'Like') {
-              self.$q.notify({
-                message: 'Someone Likes Your Post',
-                color: 'positive',
-                progress: true,
-                count:1,
-                // avatar: '../statics/avat_atem.png',
-                avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
-                actions: [
-                  { label: 'Dismis',
-                    color: 'white',
-                    handler: () => { /!* ... *!/ }
-                  }
-                ]
-              })
-            }
-
-          });
-        }
-        );
-      */
-
 /*
       const reactChannel = window.Echo.channel('react-channel');
       reactChannel.listen('.App\\Events\\CommentReactionEvent',
@@ -1258,12 +1267,14 @@ export default {
     // ############## END WEB SOCKETS END #####################//
   },
 
+  computed: {
+    ...mapState('auth', [])
+  },
+
   mounted() {
-    if (process.env.API === 'http://localhost:8000/api' || 'http://localhost:8090/api'){
-     // this.pushEcho()
-    }else {
-    //  this.pusherData()
-    }
+   // console.log(window.location.hostname)
+
+    this.pushEcho()
   },
 
 };

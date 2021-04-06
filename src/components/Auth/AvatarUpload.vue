@@ -74,15 +74,10 @@ export default {
       const form = new FormData()
       form.append('image', image, image.name)
 
-
-     // console.log(' UPLOAD FILES ::')
-      // console.log(image)
       axios.post(apiUrl, form)
         .then(response => {
-          console.log(' AVATAR ::')
-          console.log(response.data)
-
-          this.$auth.user().photo_url = response.data.avatar
+          console.log(' UPLOADED AVATAR ::')
+          this.$store.commit('auth/setUserAvatar', response.data.avatar)
           this.showUpload = false
           this.label = 'Saved new avatar'
           this.showLabel = false

@@ -16,15 +16,54 @@
 
         <q-card-section>
 
-          <div class="text-caption text-grey">
+          <div class="text-caption text-grey"  @click="addName">
             <q-item-label class="text-overline text-orange-9"> Name : </q-item-label>
-            <q-input v-model="user.name" dense >
+            <q-input
+              v-model="user.name" dense
+            >
+              <q-popup-edit v-model="editUser.name">
+                <q-input v-model="editUser.name" dense autofocus counter
+                         @input="updateInput('Name')"
+                         ref="Name"
+                />
+              </q-popup-edit>
+
               <template v-slot:before>
                 <q-icon name="eva-person"/>
               </template>
-
             </q-input>
-            {{user.about}}
+
+
+
+<!--            <div @click="showEditor">
+
+              <template>
+                <div class="q-pa-md q-gutter-sm" v-show="editor">
+                  <q-editor :value="user.about"  />
+                </div>
+              </template>
+
+            </div>-->
+            <q-item-label class="text-overline text-orange-9"> About:</q-item-label>
+            <div @click="aboutMe">
+              <div v-html="user.about"></div>
+              <q-popup-edit
+                buttons
+                v-model="user.about"
+              >
+                <q-editor
+                  v-model="editUser.about"
+                  min-height="5rem"
+                  autofocus
+                  counter
+                  ref="About"
+                  @input="updateInput('About')"
+                  @set="updateInput('About')"
+                />
+              </q-popup-edit>
+            </div>
+
+
 
             <q-item-label class="text-overline text-orange-9"> User name : </q-item-label>
             <q-input v-model="user.username" dense />
@@ -35,17 +74,6 @@
             <q-item-label class="text-overline text-orange-9"> Email : </q-item-label>
             <q-input v-model="user.email" dense disable/>
 
-
-            <q-item-label class="text-overline text-orange-9"> About: </q-item-label>
-            <q-input v-model="user.about" dense @click="showEditor" >
-            </q-input>
-
-            <template >
-              <div class="q-pa-md q-gutter-sm" v-show="editor">
-                <q-editor v-model="user.about" min-height="5rem" />
-              </div>
-            </template>
-
             <q-item-label class="text-overline text-orange-9"> Formatted Address: </q-item-label>
             <q-input v-model="user.formatted_address" dense />
 
@@ -54,10 +82,9 @@
 
             <q-item-label class="text-overline text-orange-9"> Location Coordinates </q-item-label>
 
-            Longitude : <q-input v-model="user.location.longitude" dense />
-            Latitude :<q-input  v-model="user.location.latitude" dense />
+<!--            Longitude : <q-input v-model="user.location.longitude" dense />
+            Latitude :<q-input  v-model="user.location.latitude" dense />-->
             {{user.location}}
-
 
 
             <div class="row justify-end">
@@ -74,7 +101,7 @@
               </q-btn>
             </div>
           </div>
-          <!--        <MapView/>-->
+<!--                  <MapView/>-->
 
         </q-card-section>
       </div>
@@ -102,7 +129,15 @@ export default {
       editor:false,
       dense: false,
       test: '',
-      submitting: false
+      submitting: false,
+      editUser:{
+        about:'',
+        name:'',
+        tagline:'',
+        username:'',
+        formatted_address:'',
+        available_to_hire: false
+      },
     }
   },
 
@@ -113,14 +148,12 @@ export default {
 
       let apiUrl =  process.env.API+'/settings/profile'
 
-
       axios.put(apiUrl, this.user)
         .then(response => {
-          console.log(' SONGS ::')
+          console.log(' AVATAR ::')
           console.log(response.data)
-
-          this.user = response.data
-          this.avatar = response.data.avatar
+          this.$store.commit('auth/setUser', response.data)
+          this.about = this.$auth.user().about
           this.showUpload = false
           this.label = 'Saved new avatar'
           this.showLabel = false
@@ -129,6 +162,7 @@ export default {
         .catch(error => {
           console.log(error)
         })
+
 
       // Simulating a delay here.
       // When we are done, we reset "submitting"
@@ -141,13 +175,25 @@ export default {
     showEditor(){
       return this.editor = !this.editor
     },
-    changeAvatar(){
 
-    }
+    aboutMe(){
+      this.editUser.about = this.$auth.user().about
+    },
+    addName(){
+      this.editUser.name = this.$auth.user().name
+    },
+
+    updateInput(input){
+      this.$store.commit('auth/setUser'+input, this.$refs[input].value)
+    },
+
+
   },
+
+
   mounted() {
     setTimeout(() => {
-      console.log(this.user)
+      // nothing here
     }, 3000)
   }
 }

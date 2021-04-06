@@ -15,9 +15,11 @@ const routes: RouteConfig[] = [
       { path: '/express', component: () => import('pages/payments/PageExpressPaypal.vue') },
       { path: '/paypalclient', component: () => import('pages/payments/PagePaypalClient.vue') },
 
-
       { path: '/audio', component: () => import('pages/PageAudio.vue') },
+      { path: '/price', component: () => import('pages/PageTracker.vue') },
       { path: '/video', component: () => import('pages/PageVideo.vue') },
+      { path: '/weather/forecast', component: () => import('pages/Weather/PageForecast.vue') },
+      { path: '/stream', component: () => import('pages/PageStream.vue') },
       { path: '/login', component: () => import('pages/auth/login.vue') },
       { path: '/logout', component: () => import('pages/auth/Logout.vue') },
       { path: '/register', component: () => import('pages/auth/register.vue') },
