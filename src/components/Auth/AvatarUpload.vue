@@ -16,41 +16,16 @@
       label="Upload Avatar"
     />
 
-<!--    <template>
-      <div id="app">
-        <file-pond
-          name="image"
-          ref="pond"
-          label-idle="Drop files here..."
-          v-bind:allow-multiple="true"
-          accepted-file-types="image/jpeg, image/png"
-          server="http://localhost:8090/api/avatar"
-          v-on:init="handleFilePondInit"
-          @click="upload(file)"
-        />
-      </div>
-    </template>-->
-
   </div>
 
 </template>
 
 <script>
 
-//           v-on:init="handleFilePondInit"
-
-import vueFilePond from "vue-filepond";
-import "filepond/dist/filepond.min.css";
 import axios from "axios";
-const FilePond = vueFilePond(
-);
-//
 
 export default {
   name: "AvatarUpload",
-  components: {
-    FilePond
-  },
   props:['avatar'],
   data: function () {
     return {
@@ -134,10 +109,6 @@ export default {
       }, 500)
     },
 
-    handleFilePondInit: function () {
-      let file = this.$refs.pond.getFiles();
-
-    },
   }
 };
 </script>

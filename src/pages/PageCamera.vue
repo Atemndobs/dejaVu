@@ -15,7 +15,15 @@
      />
 
    </div>
-   <q-btn label="Upload" @click="showUpload = true"/>
+   <q-btn :label="this.showUpload ? 'CANCEL' : 'UPLOAD' " @click="toggleUpload()"/>
+   <q-file
+     v-show="showUpload"
+     outlined
+     v-model="imageUpload"
+     label="Chose an image"
+     accept="image/*"
+     @input="captureImageFallback"
+   />
    <div class="text-center q-pa-md">
      <q-btn
         @click="captureImage"
@@ -25,6 +33,7 @@
         size="lg"
         v-if="hasCameraSupport && showCamera"
         :disable="imageCaptured"
+        v-show="!showUpload"
       />
 
       <q-btn
@@ -51,14 +60,6 @@
     </q-file>
 
    </div>
-   <q-file
-     v-show="showUpload"
-     outlined
-     v-model="imageUpload"
-     label="Chose an image"
-     accept="image/*"
-     @input="captureImageFallback"
-   />
 
    <div class="row justify-center q-ma-md">
      <q-input
@@ -131,7 +132,7 @@ export default {
         hasCameraSupport: true,
         locationLoading: false,
         showCamera: true,
-        showUpload:false
+        showUpload:false,
 
       }
     },
@@ -406,7 +407,7 @@ export default {
                   .then(response => {
 
                   console.log('SUBMITTED POST :: => ')
-                 // console.log(response)
+                  console.log(response)
                   this.$router.push('/')
 
                   this.$q.notify({
@@ -437,6 +438,10 @@ export default {
                 })
 
       },
+
+      toggleUpload(){
+        this.showUpload = !this.showUpload
+      }
 
     },
     mounted() {

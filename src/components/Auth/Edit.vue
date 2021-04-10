@@ -33,17 +33,6 @@
               </template>
             </q-input>
 
-
-
-<!--            <div @click="showEditor">
-
-              <template>
-                <div class="q-pa-md q-gutter-sm" v-show="editor">
-                  <q-editor :value="user.about"  />
-                </div>
-              </template>
-
-            </div>-->
             <q-item-label class="text-overline text-orange-9"> About:</q-item-label>
             <div @click="aboutMe">
               <div v-html="user.about"></div>
@@ -63,8 +52,6 @@
               </q-popup-edit>
             </div>
 
-
-
             <q-item-label class="text-overline text-orange-9"> User name : </q-item-label>
             <q-input v-model="user.username" dense />
 
@@ -78,7 +65,12 @@
             <q-input v-model="user.formatted_address" dense />
 
             <q-item-label class="text-overline text-orange-9"> Available to hire?</q-item-label>
-            <q-input v-model="user.available_to_hire" dense />
+            <q-toggle
+              v-model="user.available_to_hire"
+              checked-icon="check"
+              color="green"
+              unchecked-icon="clear"
+            />
 
             <q-item-label class="text-overline text-orange-9"> Location Coordinates </q-item-label>
 
@@ -101,8 +93,7 @@
               </q-btn>
             </div>
           </div>
-<!--                  <MapView/>-->
-
+          <MapView/>
         </q-card-section>
       </div>
 
@@ -110,7 +101,7 @@
   </form>
 </template>
 
-<MapView/>
+<!--<MapView/>-->
 <script>
 
 import MapView from "../Location/MapView";
@@ -125,10 +116,8 @@ export default {
       text: '',
       newAvatar : false,
       oldAvatar : true,
-      ph: '',
       editor:false,
       dense: false,
-      test: '',
       submitting: false,
       editUser:{
         about:'',
@@ -163,13 +152,6 @@ export default {
           console.log(error)
         })
 
-
-      // Simulating a delay here.
-      // When we are done, we reset "submitting"
-      // Boolean to false to restore the
-      // initial state.
-
-
       this.submitting = false
     },
     showEditor(){
@@ -182,20 +164,11 @@ export default {
     addName(){
       this.editUser.name = this.$auth.user().name
     },
-
     updateInput(input){
       this.$store.commit('auth/setUser'+input, this.$refs[input].value)
     },
-
-
   },
 
-
-  mounted() {
-    setTimeout(() => {
-      // nothing here
-    }, 3000)
-  }
 }
 </script>
 

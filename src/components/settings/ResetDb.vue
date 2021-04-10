@@ -38,7 +38,7 @@ export default {
 
   methods:{
     async resetDB() {
-      const apiUrl = process.env.API+"/settings/reset/db"
+      const apiUrl = process.env.API+"/admin/settings/reset/db"
 
       axios.post(apiUrl)
         .then(response => {

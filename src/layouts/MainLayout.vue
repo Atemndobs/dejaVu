@@ -45,93 +45,6 @@
         >
           DejaVu
         </q-toolbar-title>
-<!--        <q-fab
-          icon="menu"
-          direction="left"
-          text-color="black"
-          padding="xs"
-          flat
-        >
-          <q-fab-action external-label label-position="left"
-                        to="/audio"
-                        icon="eva-headphones-outline"
-                        text-color="black"
-                        size="18px"
-                        rounded
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />
-
-&lt;!&ndash;          <q-fab-action external-label label-position="left"
-                        to="/battery"
-                        icon="eva-battery"
-                        text-color="black"
-                        size="18px"
-                        rounded
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />
-          <q-fab-action external-label label-position="left"
-                        to="/photo"
-                        icon="eva-camera"
-                        text-color="black"
-                        size="18px"
-                        rounded
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />
-          <q-fab-action external-label label-position="left"
-                        to="/location"
-                        icon="eva-navigation"
-                        round
-                        text-color="black"
-                        size="18px"
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />
-          <q-fab-action external-label label-position="left"
-                        to="/pay"
-                        icon="eva-shopping-bag-outline"
-                        round
-                        text-color="black"
-                        size="18px"
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />
-          <q-fab-action external-label label-position="left"
-                        to="/paypalclient"
-                        icon="eva-shopping-bag"
-                        round
-                        text-color="black"
-                        size="18px"
-                        dense
-                        label=""
-                        padding="xs"
-                        flat
-          />&ndash;&gt;
-        </q-fab>-->
-
-<!--        <q-btn
-          class="q-mr-sm"
-          to="/pay"
-          icon="eva-shopping-bag-outline"
-          round
-          text-color="black"
-          size="18px"
-          dense
-          flat
-        />-->
-
         <q-btn
           class="q-mr-sm"
           to="/settings"
@@ -141,6 +54,7 @@
           size="15px"
           dense
           flat
+          v-show="this.$auth.check() && this.$auth.user().role === 1"
         />
 
         <q-btn
@@ -234,31 +148,6 @@
             />
           </q-item-section>
         </q-item>
-
-        <!-- Dark Mod is not working Properly -->
-<!--        <q-item>
-          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45; Dark mode activations-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
-          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45;    :icon="$q.dark.isActive ? 'eva-settings' : 'eva-settings-outline'"  &#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
-          <q-item-section>
-            <q-btn
-
-              color="grey"
-              flat
-              dense
-              round
-              @click="$q.dark.isActive ? $q.dark.set(false) : $q.dark.set(true)"
-              no-caps
-            >
-              <q-badge color="grey" transparent>{{$q.dark.isActive ?'Light' :'Dark'}}</q-badge>
-            </q-btn>
-            <q-separator
-              vertical
-              spaced
-            />
-          </q-item-section>
-&lt;!&ndash;          <q-toggle :value="$q.dark.isActive" @click="$q.dark.toggle()" />&ndash;&gt;
-          &lt;!&ndash;&#45;&#45;&#45;&#45;&#45;&#45; Dark mode activations-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&ndash;&gt;
-        </q-item>-->
       </q-toolbar>
     </q-header>
 
@@ -406,6 +295,7 @@
                         color="amber-1"
                         label=""
                         padding="xs"
+                        v-show="this.$auth.check() && this.$auth.user().role === 1"
           />
         </q-fab>
       </q-item>
@@ -422,24 +312,6 @@ let deferredPrompt;
 window.Pusher = require('pusher-js');
 
 import Echo from 'laravel-echo'
-
-/*import VueDarkMode from "@growthbunker/vuedarkmode";
-
-Vue.use(VueDarkMode, {
-  // Specify the theme to use: dark or light (dark by default).
-  theme: "dark",
-
-  // Specify the components to declare globally in your project
-  // When undefined, null or given an empty array, all components will be imported
-  components: [
-    // Base components
-    "alert", "avatar", "badge", "button", "divider", "heading", "icon",  "progress-bar",  "spinner",
-
-    // Field components
-    "checkbox", "file", "image-uploader", "input", "input-numeric", "label", "message", "radios", "select", "tabs", "textarea", "toggle"
-  ]
-});*/
-
 export default {
   name: 'MainLayout',
   data() {
@@ -542,7 +414,62 @@ export default {
       })
     },
 
+    liveForecast(data){
+      JSON.stringify(data)
 
+      let city = data.forecast.timezone
+      let temp = data.forecast.actual.temp
+      let message = `The forecast for  ${city} is ${temp} °C`
+      this.showNotif(message, 'positive')
+    },
+    liveWeather(data){
+      JSON.stringify(data)
+      let city = data.weather.name
+      let temp = data.weather.main.temp
+      let message = `The current Temperature in ${city} is ${temp}°C`
+      this.showNotif(message, 'teal')
+    },
+    livePeakForecast(data){
+      JSON.stringify(data)
+      let {temp, time, city} = {...data.peak}
+      this.$store.commit('forecasts/setForecast',  {...data.peak})
+
+      if (city === 'Dusseldorf'){
+        this.$store.commit('forecasts/setDusseldorf', {peak:temp})
+      }
+      let message = `The warmest time for : ${time}  in ${city} with temperature :  ${temp} °C `
+
+      const strDate = (new Date()).toString()
+      if (time === strDate.substr(0, 24)){
+        message = `Today's peak temperature of ${temp}°C in ${city} has been reached`
+      }
+
+      this.showNotif(message, 'teal')
+    },
+    liveDailyForecast(data){
+      JSON.stringify(data)
+      let {temp, time, city} = {...data}
+      this.$store.commit('forecasts/setForecast',  {...data})
+
+      if (city === 'Dusseldorf'){
+        this.$store.commit('forecasts/setDusseldorf', {peak:temp})
+      }
+      let message = `The warmest time for : ${time}  in ${city} with temperature :  ${temp} °C `
+
+      const strDate = (new Date()).toString()
+      if (time === strDate.substr(0, 24)){
+        message = `Today's peak temperature of ${temp}°C in ${city} has been reached`
+      }
+
+      this.showNotif(message, 'teal')
+    },
+    livePriceTracker(data){
+      JSON.stringify(data)
+      const {article, details} = {...data}
+      let message = `The current Price of ${article} is ${details.price},
+          specs:  ${details.spec}, color: ${details.color}, condition: ${details.condition}`
+      this.showNotif(message, 'teal')
+    },
 
     pushEcho(){
       window.Echo = new Echo({
@@ -561,51 +488,73 @@ export default {
       const weatherChannel = window.Echo.channel('weather-channel');
       weatherChannel.listen('.App\\Events\\WeatherFetchEvent',
         function (data) {
-          JSON.stringify(data)
-
+        self.liveWeather(data)
         }
       );
 
       const forecastChannel = window.Echo.channel('forecast-channel');
       forecastChannel.listen('.App\\Events\\ForecastUpdatedEvent',
         function (data) {
-          JSON.stringify(data)
-
-          let city = data.forecast.timezone
-          let temp = data.forecast.current.temp
-          let message = `The forecast for  ${city} is ${temp} °C`
-          self.showNotif(message, 'positive')
+        self.liveForecast(data)
         }
       );
 
+      const dailyForecastChannel = window.Echo.channel('dailyForecast-channel');
+      dailyForecastChannel.listen('.App\\Events\\DailyForecastEvent',
+        function (data) {
+        self.liveDailyForecast(data)
+        }
+      );
 
       const peakChannel = window.Echo.channel('peak-channel');
       peakChannel.listen('.App\\Events\\PeakTemperatureEvent',
         function (data) {
-          JSON.stringify(data)
-          console.log(data)
-
-          let city = 'Dusseldorf'
-          let temp = data.peak
-          self.$store.commit('forecasts/setDusseldorf', {peak:temp})
-          let message = `Today's peak temperature of ${temp}°C in ${city} has been reached`
-          self.showNotif(message, 'teal')
+        self.livePeakForecast(data)
         }
       );
-
 
       const priceChannel = window.Echo.channel('price-channel');
       priceChannel.listen('.App\\Events\\PriceCheckEvent',
         function (data) {
-          JSON.stringify(data)
-          const {article, details} = {...data}
-
-         // self.$store.commit('forecasts/setDusseldorf', {peak:temp})
-          let message = `The current Price of ${article} is ${details.price},
-          specs:  ${details.spec}, color: ${details.color}, condition: ${details.condition}`
-          self.showNotif(message, 'teal')
+        self.livePriceTracker(data)
         }
       );
+
+    },
+    pusherData() {
+      const pusher = new Pusher(process.env.PUSHER.KEY, {
+        cluster: 'eu'
+      });
+      let self = this
+
+
+      const weatherChannel = pusher.subscribe('weather-channel');
+      weatherChannel.bind('App\\Events\\WeatherFetchEvent',
+        function (data){
+          self.liveWeather(data)
+        }
+      )
+
+      const forecastChannel = pusher.subscribe('forecast-channel');
+      forecastChannel.bind('App\\Events\\ForecastUpdatedEvent',
+        function (data){
+          self.liveForecast(data)
+        }
+      )
+
+      const peakChannel = pusher.subscribe('peak-channel');
+      peakChannel.bind('App\\Events\\PeakTemperatureEvent',
+        function (data){
+          self.livePeakForecast(data)
+        }
+      )
+
+      const priceChannel = pusher.subscribe('price-channel');
+      priceChannel.bind('App\\Events\\PriceCheckEvent',
+        function (data){
+          self.livePriceTracker(data)
+        }
+      )
 
     },
   },

@@ -1,15 +1,5 @@
 <template>
   <div>
-
-    <q-btn label="Stream" @click="startStream"/>
-    <!-- Vissues begin here-->
-<!--    <template>
-      <Vssue
-        :title="title"
-        :options="options"
-      />
-    </template>-->
-
     <q-page class="constrain q-pa-md">
       <div class="row q-col-gutter-lg">
         <div class="col-12 col-sm-8">
@@ -21,7 +11,6 @@
                 class="card-post q-mb-md"
                 flat
               >
-<!--                {{post.user.email}}-->
                 <q-item>
                   <q-item-section avatar>
                     <q-avatar>
@@ -51,9 +40,6 @@
                     src-placeholder="https://cdn-images-1.medium.com/max/80/1*xjGrvQSXvj72W4zD6IWzfg.jpeg"
                   />
                 </template>
-              <!--- Image Emoji ?  -->
-<!--                <VueEmojiReact v-model="emojis"/>-->
-
                 <q-card-section>
                   <!---------Post Section Start ------------->
                   <q-item-section>
@@ -211,7 +197,6 @@
                             </div>
                           </template>
                           <!---------Edit Comment End ------------->
-                          <!--{{comment.reaction_count}}-->
                           <!---------Comment Reactions Start ------------->
                           <q-item >
                             <q-fab
@@ -296,7 +281,6 @@
 
                           </q-item>
                           <!---------Comment Reactions  End------------->
-
                           <q-chat-message
                             @click="switchInput"
                             :name="comment.commenter.name"
@@ -310,9 +294,6 @@
                             dense
                           >
                           </q-chat-message>
-                          <!-- comment reacting Emojis?  seems to cause slow response time-->
-                          <!--   <VueEmojiReact v-model="emojis"/>-->
-
                           <!---------Comment Reply Input Start  ------------->
                           <q-input
                             v-show="activeInput"
@@ -454,11 +435,11 @@
                   Following : {{this.$auth.user()?this.$auth.user().following_count:''}}
                 </q-item-label>
                 <q-item-label caption class="text-blue-9 q-pa-xs">
-                  Available to hire : {{this.$auth.user().available_to_hire?'Yes':'No'}}
+                   {{this.$auth.user().available_to_hire?'Available to hire':'Not Looking'}}
                 </q-item-label>
 
                 <q-item-label caption class="text-blue-9 q-pa-xs">
-                  Designs : {{this.$auth.user()?this.$auth.user().post_count:''}}
+                  Posts : {{this.$auth.user()?this.$auth.user().post_count:''}}
                 </q-item-label>
               </q-item-section>
             </q-item>
@@ -473,11 +454,6 @@
         <h5 class="text-center text-grey">
           You are all caught up !
           {{ tada }}
-<!--          <picker set="emojione" />
-          <picker @select="addEmoji" />
-          <picker title="Pick your emoji…" emoji="point_up" />
-          <picker :style="{ position: 'absolute', bottom: '20px', right: '20px' }" />
-          <picker :i18n="{ search: 'Recherche', categories: { search: 'Résultats de recherche', recent: 'Récents' } }" />-->
         </h5>
 
       </div>
@@ -493,33 +469,16 @@ import {date} from 'quasar'
 import axios from "axios";
 import Echo from 'laravel-echo'
 import { emojiIndex } from 'emoji-mart-vue'
-import { emojis } from 'emoji-mart-vue'
 import InfiniteLoading from 'vue-infinite-loading';
-import VueEmojiReact from 'vue-emoji-react'
 import { VLazyImagePlugin } from "v-lazy-image";
 import { Picker } from 'emoji-mart-vue'
 
-// import vssue
-import Vssue from 'vssue'
-import GithubV3 from '@vssue/api-github-v3'
-import 'vssue/dist/vssue.css'
-import {mapActions, mapGetters, mapState} from "vuex";
-
+import {mapState} from "vuex";
 import Vue from "vue";
-Vue.use(VLazyImagePlugin);
-Vue.component('VueEmojiReact', VueEmojiReact);
-Vue.use(Vssue, {
-  api: GithubV3,
-  // here set the default options for your OAuth App
-  owner: 'Atemndobs',
-  repo: 'deja-vu',
-  clientId: 'bab01518791732be829c',
-  clientSecret: '60bf90e7476c7ad1366b22a8e0fc9ab9d869ac26', // only required for some of the platforms
-})
 
+Vue.use(VLazyImagePlugin);
 
 function notification(postData) {
-
   if ( postData.author === postData.userId) {
     postData.self.$q.notify({
       message: postData.message,
@@ -546,8 +505,6 @@ export default {
     Picker,
     VLazyImagePlugin,
     InfiniteLoading,
-   // VssueComponent,
-
   },
 
   data() {
@@ -566,37 +523,9 @@ export default {
       page: 1,
       tada:'',
       postReacting:{},
-      emojis : [
-        {
-          name: 'rage',
-          count: 2
-        },
-        {
-          name: 'blush',
-          count: 1
-        },
-        {
-          name: 'shrug',
-          count: 3
-        },
-        {
-          name: 'grinning',
-          count: 2
-        }
-      ],
-      // here set the title of issue of current page
-      title: 'Vissue Title Slot',
-
-      // notice that, the options here will override the default options set by `Vue.use()` above
-      // if you do not want to change them, just set the `title` prop, and ignore the `options` prop
-      options: {
-        // owner: 'OWNER_OF_REPO',
-        // repo: 'NAME_OF_REPO',
-        // clientId: 'YOUR_CLIENT_ID',
-        // clientSecret: 'YOUR_CLIENT_SECRET', // only required for some of the platforms
-      },
     }
   },
+
   filters: {
     niceDate(value) {
       return  date.formatDate(value, 'MMMM D h:mmA')
@@ -606,6 +535,7 @@ export default {
       return items.slice().reverse()
     }
   },
+
   methods: {
 
     infiniteHandler($state) {
@@ -672,16 +602,13 @@ export default {
 
       axios.post(apiUrl, data)
         .then(response => {
-//          console.log(' RESPONSE FROM USERa ::')
           const position = this.posts.indexOf(post)
           const reaction_type = response.data.data.reaction_type
 
           if (reaction_type === data.type) {
-           // this.posts[position].loveReactant.icon_class = 'eva-heart'
             this.posts[position].is_liked = true
             this.posts[position].likes_count = response.data.data.likes_count
           }else {
-           // this.posts[position].loveReactant.icon_class = 'eva-heart-outline'
             this.posts[position].is_liked = false
             this.posts[position].likes_count = response.data.data.likes_count
           }
@@ -693,9 +620,6 @@ export default {
     },
 
     reactComment(type,comment, post){
-      // console.log('====== Add reaction to Comment ======')
-     // console.log(type)
-
       if (!this.$auth.check()){
         this.$q.dialog({ 'message' : "You need to Login Before you can Like" })
         this.$router.push('/login')
@@ -714,29 +638,17 @@ export default {
       }
       axios.post(apiUrl, data)
         .then(response => {
-
-          console.log(' RESPONSE ::')
-          console.log(response.data)
-
-         // const position = this.posts.indexOf(post)
-        //  const reaction_type = response.data.reaction_type
           if (userId === response.data.user_id) {
             Object.entries(this.posts).forEach(([key, post]) => {
-
               if (post.id === response.data.post_id){
-                 // console.log('====== THE POST STOP======')
                 for (var j = 0; j < post.comments.length ; j++) {
                   if (post.comments[j].id === response.data.comment_id) {
-                    // console.log('====== IN THE LOOP ======')
-                   // console.log(post.comments[j].reaction_count )
                     post.comments[j].reaction_count = response.data.reaction_count
                   }
                 }
               }
             });
           }
-
-
         }).catch(error => {
         console.log(error)
       })
@@ -753,7 +665,6 @@ export default {
       }
       const userId = this.$auth.user().id
       const apiUrl = process.env.API+"/posts/comment/"+post.id
-
       let data = {
         user_id:userId,
         comment: comment,
@@ -769,20 +680,11 @@ export default {
           currentPost.comments_count = response.data.data['comment_count']
           currentPost.new_comment = response.data.data.comment['comment']
 
-/*          console.log('RESPONSE')
-          console.log(response.data.data)
-          console.log('RESPONSE ENd')
-          console.log('POST  ===================')
-          console.log(currentPost.comments)
-          console.log('POST  END  ===================')*/
-
-
           let newComment = {
             id:'',
             comment:response.data.data.comment['comment'],
             commenter: {
               name:response.data.data.comment.commenter['name'],
-              //photo_url:response.data.data.comment.commenter['photo_url']
               photo_url:this.$auth.user().photo_url
             },
             childComments:{},
@@ -793,12 +695,8 @@ export default {
             created_dates:response.data.data.created_dates,
 
           }
-
           currentPost.comments.unshift(newComment)
-         // console.log(currentPost)
-
           this.commentBox = [];
-
         }).catch(error => {
         console.log(error)
       })
@@ -816,11 +714,9 @@ export default {
       }
 
       const apiUrl = process.env.API+"/comments/comment/"+comment.id
-
       let data = {
         comment: reply,
       }
-
       axios.post(apiUrl, data)
         .then(response => {
           const position = this.posts.indexOf(post)
@@ -842,7 +738,6 @@ export default {
           }
 
           currentPost.comments[commentPosition].childComments.unshift(newComment)
-
         }).catch(error => {
         console.log(error)
       })
@@ -855,14 +750,9 @@ export default {
       if (!this.$auth.check()){
         this.$q.dialog({ 'message' : "You need to Login Before you can Follow" })
         this.$router.push('/login')
-        console.log({
-         // 'Error' : 'You need to log in to react to a post'
-        })
         return
       }
-
       const userId = this.$auth.user().id
-
       if (userId === authorId){
        this.$q.dialog({ 'message' : "Hmmm! Trying to follow the man in the mirror ? " +
            "We admire the Self Love, but its recommended to follow someone else" + christmas })
@@ -876,7 +766,6 @@ export default {
       }
       axios.post(apiUrl, data)
         .then(response => {
-
            post.is_user_following = response.data.is_user_following
            post.user.follower_count = response.data.follower_count
           this.$store.commit('auth/setUserFollowingCount', response.data.user_following_count)
@@ -892,70 +781,182 @@ export default {
     activateParentComment(){
       return this.activateAddComment = !this.activateAddComment
     },
-
     activateEditComment(comment){
       return true
     },
     editComment(comment){
       this.set = true
     },
-
     reactedPost(post){
       this.postReacting = post
     },
 
-    startStream(){
-      let  videoUrl = process.env.VIDEO
+    liveComment(data) {
+      JSON.stringify(data)
+      let sender = parseInt(data.comment.commenter.id)
+      let userId = parseInt(this.$auth.user().id)
+      let post = this.posts[data.position]
 
-      let data = {
-        'signal_data' : 'signal from the vue application'
+      let newComment = {
+        id: data.comment.id,
+        comment:data.comment.comment,
+        commenter: {
+          name:data.comment.commenter.name,
+          photo_url:data.comment.commenter.avatar,
+        },
+        childComments:{},
+        parent:{},
+        reaction_count: '',
+        reactions: '',
+        updated_dates:data.updated_dates,
+        created_dates:data.created_dates,
+
       }
 
-      axios.post(videoUrl+'video/call', data)
-        .then(response => {
+      if (userId !== sender){
+        post.comments.unshift(newComment)
+        post.comments_count = data.comments_count
+        this.posts[data.position].new_comment = data.comment.comment
+      }
 
-          console.log(' RESPONSE FROM VIDEO API ::')
-           console.log(response)
-          console.log('VIDEO API :: END')
+      let message = `${data.comment.commenter.name} says: ${data.comment.comment}`
+      if (userId === sender) {
+        message = `Your Comment has been added`
+      }
 
-        }).catch(error => {
-        console.log(error)
-      })
+      let postData = {
+        message : message,
+        avatar : data.comment.commenter.avatar,
+        author : data.author,
+        userId : userId,
+        self: this
+      }
+      notification(postData)
+    },
+    liveLike(data) {
+      JSON.stringify(data)
+      let post = this.posts[data.post.position]
+      let userId = parseInt(this.$auth.user().id)
+
+      if (data.post.reacter.id !== userId){
+        post.likes_count = data.post.likes.likes_count
+      }
+
+      if (data.post.is_liked){
+        let message = `${data.post.reacter.name} Likes Your Post`
+        if (data.post.reacter.id === userId){
+          message = `I like I like !!`
+        }
+        let postData = {
+          message : message,
+          avatar : data.post.reacter.avatar,
+          author : data.post.author,
+          userId : userId,
+          self:this
+        }
+        notification(postData);
+      }
+    },
+    liveFollow(data) {
+      JSON.stringify(data)
+      let userId = parseInt(this.$auth.user().id)
+      let author = data.author.id
+      let post = this.posts[data.position]
+      post.user.follower_count = data.author.follower_count
+
+      if (userId === author){
+        this.$store.commit('auth/setUserFollowerCount', data.author.follower_count)
+      }
+
+      if (data.is_user_following){
+        let postData = {
+          message :`New Follower :  ${data.user.name} `,
+          avatar : data.user.avatar,
+          author : author,
+          userId : userId,
+          self: this
+        }
+        notification(postData);
+      }
+    },
+    livePost(data) {
+      JSON.stringify(data)
+      let userId = this.$auth.user().id
+      let author = data.post.user
+      let authorId = data.post.user.id
+
+      if (userId !== authorId) {
+         this.posts.unshift(data.post)
+
+        let postData = {
+          message :`New Post from :  ${author.name} `,
+          avatar : author.photo_url,
+          author : authorId,
+          userId : userId,
+          self: this
+        }
+
+        this.$q.notify({
+          message: postData.message,
+          color: 'positive',
+          progress: true,
+          count: 1,
+          avatar: postData.avatar,
+          //avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
+          actions: [
+            {
+              label: 'Dismis',
+              color: 'white',
+              handler: () => { /* ... */
+              }
+            }
+          ]
+        })
+
+        notification(postData);
+      }
+
     },
 
     // ############### WEB SOCKETS #####################//
 
-/*    pusherData() {
-      const pusher = new Pusher('8643c99a8b00ff38c513', {
+    pusherData() {
+      const pusher = new Pusher(process.env.PUSHER.KEY, {
         cluster: 'eu'
       });
       let self = this
 
       const commentChannel = pusher.subscribe('comment-channel');
       commentChannel.bind('App\\Events\\CommentCreatedEvent',
-        function (data) {
-          console.log('COMMING FROM PUSSHER ====================')
-         JSON.stringify(data)
-          Object.entries(self.posts).forEach(([key, post]) => {
-
-
-            let sender = parseInt(data.new_comment.commenter_id)
-            let user = parseInt(self.$auth.user().id)
-
-            if (sender !== user || !this.$auth.check()) {
-              if (post.id === data.post_id) {
-                post.comments_count = data.comments_count
-                post.new_comment = data.new_comment
-                post.comments.unshift(data.new_comment)
-
-                  // console.log(data)
-              }
-            }
-          });
+        function (data){
+          console.log(data)
+        self.liveComment(data)
         }
       )
 
-      const replyChannel = pusher.subscribe('reply-channel');
+      const likeChannel = pusher.subscribe('like-channel-post');
+      likeChannel.bind('App\\Events\\LikeCreatedEvent',
+        function (data) {
+          console.log(data)
+          self.liveLike(data)
+        }
+      );
+
+      const followChannel = pusher.subscribe('follow-channel');
+      followChannel.bind('App\\Events\\FollowCreatedEvent',
+        function (data){
+          self.liveFollow(data)
+        }
+      )
+
+      const postChannel = window.Echo.channel('post-channel');
+      postChannel.listen('.App\\Events\\PostCreatedEvent',
+        function (data) {
+        self.livePost(data)
+        }
+      );
+
+/*      const replyChannel = pusher.subscribe('reply-channel');
       replyChannel.bind('App\\Events\\ChildCommentCreatedEvent',
         function (data) {
           JSON.stringify(data)
@@ -974,81 +975,11 @@ export default {
         }
       );
 
-      const likeChannel = pusher.subscribe('like-channel');
-      likeChannel.bind('App\\Events\\LikeCreatedEvent',
-        function (data) {
-          JSON.stringify(data)
-
-          Object.entries(self.posts).forEach(([key, post]) => {
-
-            let sender = parseInt(data.post.reacter_id)
-            let user = parseInt(self.$auth.user().id)
-
-
-            if (sender !== user ) {
-              if (post.id === data.post.id){
-                const position = self.posts.indexOf(post)
-                self.posts[position].loveReactant.likes_count = data.post.loveReactant.likes_count
-                // console.log('OLD LIKES :: ' +  self.posts[position].loveReactant.likes_count)
-                // console.log('NEW COUNT ' +  data.post.loveReactant.likes_count)
-              }
-
-            }
-
-          });
-        }
-      );
 
       const reactChannel = pusher.subscribe('react-channel');
       reactChannel.bind('App\\Events\\CommentReactionEvent',
         function (data) {
-          JSON.stringify(data)
-          //  console.log('====== FROM THE SOCKET ======')
-          //  console.log(data)
-          let sender = parseInt(data.reacter_id)
-          let user = parseInt(self.$auth.user().id)
-
-          if (sender !== user){
-            Object.entries(self.posts).forEach(([key, post]) => {
-
-              if (post.id === data.post_id){
-                //  console.log('====== THE POST STOP======')
-                // console.log(data)
-
-                for (var j = 0; j < post.comments.length ; j++) {
-
-                  // console.log(post.comments[j])
-                  if (post.comments[j].id === data.comment_id) {
-
-                    // console.log('====== IN THE LOOP ======')
-                    // console.log(post.comments[j].reaction_count )
-                    // console.log( data.reaction_count)
-
-                    post.comments[j].reaction_count = data.reaction_count
-                  }
-                }
-              }
-            });
-          }
-
-          // notification
-          /!*            if (data.post.loveReactant.reaction_type === 'Like') {
-                        self.$q.notify({
-                          message: 'Someone Likes Your Post',
-                          color: 'positive',
-                          progress: true,
-                          count:1,
-                          // avatar: '../statics/avat_atem.png',
-                          avatar: 'https://firebasestorage.googleapis.com/v0/b/deja-vue-e67a1.appspot.com/o/avat_atem.png?alt=media&token=5827b153-5462-4301-81be-ade0777202d4',
-                          actions: [
-                            { label: 'Dismis',
-                              color: 'white',
-                              handler: () => { /!* ... *!/ }
-                            }
-                          ]
-                        })
-                      }*!/
-
+        self.liveLike(data)
         }
       );
 
@@ -1060,8 +991,8 @@ export default {
             self.posts.unshift(data.post)
           }
         }
-      );
-    },*/
+      );*/
+    },
 
     pushEcho(){
       window.Echo = new Echo({
@@ -1074,124 +1005,35 @@ export default {
         wsPort:6001,
         disableStats:true
       });
-
       let self = this
 
       const commentChannel = window.Echo.channel('comment-channel');
       commentChannel.listen('.App\\Events\\CommentCreatedEvent',
-        function (data) {
-          JSON.stringify(data)
-          let sender = parseInt(data.comment.commenter.id)
-          let userId = parseInt(self.$auth.user().id)
-          let post = self.posts[data.position]
-
-
-          let newComment = {
-            id: data.comment.id,
-            comment:data.comment.comment,
-            commenter: {
-              name:data.comment.commenter.name,
-              photo_url:data.comment.commenter.avatar,
-            },
-            childComments:{},
-            parent:{},
-            reaction_count: '',
-            reactions: '',
-            updated_dates:data.updated_dates,
-            created_dates:data.created_dates,
-
-          }
-
-          if (userId !== sender){
-            post.comments.unshift(newComment)
-            post.comments_count = data.comments_count
-            self.posts[data.position].new_comment = data.comment.comment
-          }
-
-          let postData = {
-            message : `${data.comment.commenter.name} says: ${data.comment.comment}`,
-            avatar : data.comment.commenter.avatar,
-            author : data.author,
-            userId : userId,
-            self:self
-          }
-          notification(postData)
+        function (data){
+        self.liveComment(data)
         }
         );
-
 
       const likeChannel = window.Echo.channel(`like-channel-post`);
       likeChannel.listen('.App\\Events\\LikeCreatedEvent',
         function (data) {
-          JSON.stringify(data)
-          let post = self.posts[data.post.position]
-          let userId = parseInt(self.$auth.user().id)
-
-          if (data.post.reacter.id !== userId){
-           // console.log('THHIS GUY SHOULD BE UPDATED')
-            post.likes_count = data.post.likes.likes_count
+        self.liveLike(data)
           }
-
-          if (data.post.is_liked){
-            let postData = {
-              message : `${data.post.reacter.name} Likes Your Post`,
-              avatar : data.post.reacter.avatar,
-              author : data.post.author,
-              userId : userId,
-              self:self
-            }
-            notification(postData);
-          }
-        }
         );
-
 
       const followChannel = window.Echo.channel('follow-channel');
       followChannel.listen('.App\\Events\\FollowCreatedEvent',
-        function (data) {
-          JSON.stringify(data)
-          let userId = parseInt(self.$auth.user().id)
-          let author = data.author.id
-
-          let post = self.posts[data.position]
-          post.user.follower_count = data.author.follower_count
-          if (userId === author){
-            self.$store.commit('auth/setUserFollowerCount', data.author.follower_count)
-          }
-
-          if (data.is_user_following){
-            let postData = {
-              message :`New Follower :  ${data.user.name} `,
-              avatar : data.user.avatar,
-              author : author,
-              userId : userId,
-              self:self
-            }
-            notification(postData);
-          }
-
+        function (data){
+        self.liveFollow(data)
         }
         );
 
-      const videoChannel = window.Echo.channel('video-channel');
-      videoChannel.listen('.App\\Events\\StartVideoChat',
+      const postChannel = window.Echo.channel(`post-channel`);
+      postChannel.listen('.App\\Events\\PostCreatedEvent',
         function (data) {
-          JSON.stringify(data)
-          console.log(data)
-
-          if (data.is_user_following){
-            let postData = {
-              message :`New Follower :  ${data.user.name} `,
-              avatar : data.user.avatar,
-              author : author,
-           //   userId : userId,
-              self:self
-            }
-            notification(postData);
-          }
-
+        self.livePost(data)
         }
-        );
+      );
 
       /*
       const replyChannel = window.Echo.channel('reply-channel');
@@ -1248,20 +1090,7 @@ export default {
             }
           });
       */
-/*
-      const postChannel = window.Echo.channel('post-channel');
-      postChannel.listen('.App\\Events\\PostCreatedEvent',
-        function (data) {
-          JSON.stringify(data)
 
-         // console.log(data.post)
-          if (self.$auth.user().id !== data.post.id) {
-            console.log('RECIEVING THE POST')
-            self.posts.unshift(data.post)
-          }
-        }
-      );
-      */
     },
 
     // ############## END WEB SOCKETS END #####################//
@@ -1272,9 +1101,11 @@ export default {
   },
 
   mounted() {
-   // console.log(window.location.hostname)
+     this.pushEcho()
+    if (process.env.API.PROD){
+     // this.pusherData()
+    }
 
-    this.pushEcho()
   },
 
 };

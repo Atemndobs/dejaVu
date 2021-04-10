@@ -1,15 +1,14 @@
 <template>
   <div class="q-pa-md">
-    <q-btn color="black" class="full-width" :label="danger" />
-
     <q-btn
       :color="color"
       :label="label"
       class="q-mt-md"
-      @click="getForecast"
+      @click="getPeakForecast"
     >
       <q-tooltip content-class="bg-accent">This Is going to generate forecast for thr next 24hours (Hourly) </q-tooltip>
     </q-btn>
+    <q-input outlined v-model="query" label="City" @keypress.enter="getPeakForecast"/>
   </div>
 </template>
 
@@ -26,27 +25,30 @@ export default {
       loading1: false,
       percentage1: 0,
       danger:'DAILY FORECAST',
-      label:'GET FORECAST',
+      label:'DAILY PEAK FORECAST',
       loading2: false,
       percentage2: 0,
       query:'',
       loading3: false,
-      percentage3: 0
+      percentage3: 0,
+      city:''
     }
   },
   methods: {
-    getForecast () {
+    getPeakForecast () {
       let city = this.query===''?'Dusseldorf':this.query
-      let apiUrl = process.env.API+'/weather/forecast/'+city
+      let apiUrl = process.env.API+'/weather/peak?city='+city
 
       axios.get(apiUrl)
         .then(response => {
-          let temp = response.data.current.temp
-
-          if ( temp >= 16){
-            let message = `The temperature in ${city} now is ${temp} °C`
-          // this.showNotif(message, 'positive')
+          let {temp, time, city} = {...response.data.data.peak}
+          this.$store.commit('forecasts/setForecast',  {...response.data.data.peak})
+          if (city === 'Dusseldorf'){
+            this.$store.commit('forecasts/setDusseldorf',  {...response.data.data.peak})
           }
+          let message = `The warmest time of the day : ${time}  in ${city} with temperature :  ${temp} °C `
+
+          this.showNotif(message, 'positive')
           this.color = 'green'
         }).catch(error => {
         let message = `Please enter a valid City not ${city}`

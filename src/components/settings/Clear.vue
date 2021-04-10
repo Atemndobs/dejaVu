@@ -54,7 +54,7 @@ export default {
     },
     getOptions(){
       let id = 3;
-      const apiUrl = process.env.API+"/settings/models"
+      const apiUrl = process.env.API+"/admin/settings/models"
 
       axios.get(apiUrl)
         .then(response => {
@@ -78,7 +78,7 @@ export default {
       console.log(model)
       let id = 3;
 
-      const apiUrl = process.env.API+"/settings/clear/"+model
+      const apiUrl = process.env.API+"/admin/settings/clear/"+model
 
       axios.post(apiUrl)
         .then(response => {

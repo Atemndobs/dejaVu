@@ -46,13 +46,11 @@ export default {
     },
     getOptions(){
       let id = 3;
-      const apiUrl = process.env.API+"/settings/models"
-
+      const apiUrl = process.env.API+"/admin/settings/models"
 
       axios.get(apiUrl)
         .then(response => {
           this.options = response.data.message
-          // Handle Code here
 
           this[`percentage${id}`] = 100
           this[`loading${id}`] = false
@@ -62,14 +60,11 @@ export default {
           this[`percentage${id}`] = 100
           this[`loading${id}`] = false
         })
-      //this.options = ['posts', 'designs', 'Twitter', 'Apple', 'Oracle']
     },
+
     populateData(model){
-     // console.log(model)
-
       let id = 3;
-
-      const apiUrl = process.env.API+"/settings/model/populate/"+model
+      const apiUrl = process.env.API+"/admin/settings/model/populate/"+model
 
       axios.post(apiUrl)
         .then(response => {

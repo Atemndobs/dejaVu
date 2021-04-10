@@ -71,7 +71,7 @@ export default {
     },
     getTypes(){
       let id = 3;
-      const apiUrl = process.env.API+"/settings/types"
+      const apiUrl = process.env.API+"/admin/settings/types"
 
       axios.get(apiUrl)
         .then(response => {
@@ -101,7 +101,7 @@ export default {
 
       let id = 3;
 
-      const apiUrl = process.env.API+"/settings/types"
+      const apiUrl = process.env.API+"/admin/settings/types"
       let data = {
         reset: reset,
         types: types
