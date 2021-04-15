@@ -549,6 +549,14 @@ export default {
         }
       )
 
+
+      const dailyForecastChannel = pusher.subscribe('dailyForecast-channel');
+      dailyForecastChannel.bind('App\\Events\\DailyForecastEvent',
+        function (data){
+          self.livePeakForecast(data)
+        }
+      )
+
       const priceChannel = pusher.subscribe('price-channel');
       priceChannel.bind('App\\Events\\PriceCheckEvent',
         function (data){
