@@ -14,8 +14,21 @@
         class="q-gutter-md"
         @submit="onSubmit"
       >
+        <template>
+          <div class="q-pa-md" style="max-width: 300px">
+            <div class="q-gutter-md">
+              <q-select
+                v-model.trim="data.body.email"
+                :options="options"
+                :label="lang.auth.fields.email"
+                :rules="validations['email']"
+              />
+
+            </div>
+          </div>
+        </template>
         <q-card-section>
-          <q-input
+<!--          <q-input
             v-if="identifierField === 'email'"
             id="email"
             v-model.trim="data.body.email"
@@ -24,15 +37,7 @@
             :rules="validations['email']"
             lazy-rules
             autofocus
-          />
-          <q-input
-            v-if="identifierField === 'username'"
-            v-model.trim="data.body.username"
-            type="text"
-            :label="lang.auth.fields.username"
-            :rules="validations['username']"
-            lazy-rules
-          />
+          />-->
           <q-input
             id="password"
             v-model="data.body.password"
@@ -95,21 +100,24 @@
 import prompts from 'app/quasar.extensions.json'
 
 import isEmail from 'validator/es/lib/isEmail'
+import axios from "axios";
 
 export default {
   name: 'Login',
   data () {
     return {
       page: 'login',
+      options:[],
       lang: {
         auth: {}
       },
       data: {
         body: {
           email: 'bamarktfact@gmail.com',
-          password: 'pass1234'
+          password: 'pass1234',
         },
-        rememberMe: false
+        rememberMe: false,
+        users:[]
       },
       loading: false,
       validations: {
@@ -149,9 +157,25 @@ export default {
 
     onSubmit () {
       this.loading = true
+
+
+
+      if (process.env.API === 'https://api.next-song.app/v1'){
+        this.data = {
+          body: {
+            password: 'admin',
+            username: 'admin@admin.com',
+            client_id: 2,
+            client_secret: 'D785jpw8ZgZCdIwy4NQ328lZHK0D0yZVzqRWz8jl',
+            grant_type: 'password',
+            scope: '',
+          },
+        }
+      }
+
       this.$auth
         .login(this.data)
-        .then(response => {
+        .then(() => {
           this.$auth.fetch()
           this.$router.replace('/')
           this.$store.dispatch('auth/loginCallback')
@@ -202,7 +226,25 @@ export default {
         .finally(() => {
           this.loading = false
         })
+    },
+
+    getUsers(){
+      const apiUrl = process.env.API+"/users"
+      axios.get(apiUrl)
+        .then(response => {
+          // console.log(response)
+          Object.entries(response.data.data).forEach(([key, user]) => {
+            this.data.users.push(user.email)
+            this.options.push(user.email)
+          });
+        }).catch(error => {
+        console.log(error)
+      })
     }
+  },
+
+  mounted() {
+    this.getUsers()
   }
 }
 </script>

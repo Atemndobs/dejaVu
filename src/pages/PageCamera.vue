@@ -15,6 +15,15 @@
      />
 
    </div>
+   <q-btn :label="this.showUpload ? 'CANCEL' : 'UPLOAD' " @click="toggleUpload()"/>
+   <q-file
+     v-show="showUpload"
+     outlined
+     v-model="imageUpload"
+     label="Chose an image"
+     accept="image/*"
+     @input="captureImageFallback"
+   />
    <div class="text-center q-pa-md">
      <q-btn
         @click="captureImage"
@@ -24,6 +33,7 @@
         size="lg"
         v-if="hasCameraSupport && showCamera"
         :disable="imageCaptured"
+        v-show="!showUpload"
       />
 
       <q-btn
@@ -46,6 +56,7 @@
       <template v-slot:prepend>
         <q-icon name="eva-attach-outline" />
       </template>
+
     </q-file>
 
    </div>
@@ -90,6 +101,7 @@
         rounded
         unelevated
       />
+
     </div>
 
   </q-page>
@@ -97,6 +109,7 @@
 
 <script >
 import { uid } from 'quasar'
+import axios from "axios";
 import { error } from 'util';
 require('md-gum-polyfill');
 
@@ -112,13 +125,14 @@ export default {
           date: Date.now(),
           imageId:'',
           imageUrl: '',
-          userId:''
+          userId:'',
         },
         imageCaptured : false,
         imageUpload: [],
         hasCameraSupport: true,
         locationLoading: false,
-        showCamera: true
+        showCamera: true,
+        showUpload:false,
 
       }
     },
@@ -219,10 +233,27 @@ export default {
       getLocation() {
         this.locationLoading = true;
         navigator.geolocation.getCurrentPosition(position => {
-          this.getCityAndCountry(position)
+          try {
+            this.getPixelateLocation(position)
+          }catch (error ){
+           // this.getCityAndCountry(position)
+          }
+
         }, error => {
            this.locationError();
         }, {timeout: 7000})
+      },
+
+      async getPixelateLocation(position){
+        let data = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        }
+        await axios.post(`${process.env.API}/weather/location`, data)
+        .then(result => {
+
+          this.locationSuccesss(result)
+        })
       },
 
       getCityAndCountry(position) {
@@ -292,26 +323,26 @@ export default {
       },
       sendPost(){
       this.$q.loading.show();
-        this.createImage()
-
+        let formData = new FormData();
+        formData.append('image', this.post.photo, this.post.id + '.png')
+        formData.append('caption', this.post.caption)
+        formData.append('location', this.post.location)
+        this.submitPost(formData)
       },
       createImage(){
 
         let formData = new FormData();
-
         formData.append('image', this.post.photo, this.post.id + '.png')
+        formData.append('caption', this.post.caption)
+        formData.append('location', this.post.location)
 
-        this.$axios.post(`${process.env.API}/designs`, formData).then(response => {
+
+        this.$axios.post(`${process.env.API}/designs`, formData)
+          .then(response => {
          // console.log(response.data)
           this.user_id = response.data.user_id
           this.imageId = response.data.id;
 
-          let formData = new FormData();
-          formData.append('caption', this.post.caption)
-          formData.append('location', this.post.location)
-          formData.append('image', this.post.photo, this.post.id + '.png')
-
-          this.submitPost(formData)
 
         }).catch(error => {
           // console.log(error);
@@ -360,12 +391,23 @@ export default {
         })
       },
       submitPost(data){
+        if (!this.$auth.check()){
+          this.$q.loading.hide()
+          this.$q.dialog({ 'message' : "You need to Login Before you can create post" })
+          this.$router.push('/login')
+          console.log({
+            'Error' : 'You need to log in to react to a post'
+          })
+          return
+        }
 
-                this.$axios.post(`${process.env.API}/posts/${this.user_id}`, data).then(response => {
+      //  let userId = this.$auth.user().id
+
+                this.$axios.post(`${process.env.API}/posts`, data)
+                  .then(response => {
 
                   console.log('SUBMITTED POST :: => ')
                   console.log(response)
-
                   this.$router.push('/')
 
                   this.$q.notify({
@@ -392,11 +434,14 @@ export default {
                       message: 'Sorry Could not create post'
                     })
                   }
-
                   this.$q.loading.hide()
                 })
 
       },
+
+      toggleUpload(){
+        this.showUpload = !this.showUpload
+      }
 
     },
     mounted() {
