@@ -46,6 +46,7 @@ export default {
       })
     },
 
+/*
     pushEcho() {
       window.Echo = new Echo({
         broadcaster: 'pusher',
@@ -70,13 +71,14 @@ export default {
         }
       );
     }
+*/
 
 
 
   },
 
   mounted() {
-    this.pushEcho()
+    // this.pushEcho()
   }
 }
 </script>

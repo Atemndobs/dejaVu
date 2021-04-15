@@ -339,8 +339,8 @@ export default {
       });
     }
 
-    this.pushEcho()
-  //  this.getForecast()
+   // this.pushEcho()
+    this.pusherData()
   },
   methods: {
     installApp() {
@@ -471,7 +471,7 @@ export default {
       this.showNotif(message, 'teal')
     },
 
-    pushEcho(){
+/*    pushEcho(){
       window.Echo = new Echo({
         broadcaster: 'pusher',
         key: 'local',
@@ -520,7 +520,7 @@ export default {
         }
       );
 
-    },
+    },*/
     pusherData() {
       const pusher = new Pusher(process.env.PUSHER.KEY, {
         cluster: 'eu'

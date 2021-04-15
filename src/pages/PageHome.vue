@@ -475,8 +475,9 @@ import { Picker } from 'emoji-mart-vue'
 
 import {mapState} from "vuex";
 import Vue from "vue";
-
 Vue.use(VLazyImagePlugin);
+
+window.Pusher = require('pusher-js');
 
 function notification(postData) {
   if ( postData.author === postData.userId) {
@@ -949,12 +950,12 @@ export default {
         }
       )
 
-      const postChannel = window.Echo.channel('post-channel');
-      postChannel.listen('.App\\Events\\PostCreatedEvent',
-        function (data) {
-        self.livePost(data)
+      const postChannel = pusher.subscribe('post-channel');
+      postChannel.bind('App\\Events\\PostCreatedEvent',
+        function (data){
+          self.livePost(data)
         }
-      );
+      )
 
 /*      const replyChannel = pusher.subscribe('reply-channel');
       replyChannel.bind('App\\Events\\ChildCommentCreatedEvent',
@@ -994,7 +995,7 @@ export default {
       );*/
     },
 
-    pushEcho(){
+/*    pushEcho(){
       window.Echo = new Echo({
         broadcaster: 'pusher',
         key: 'local',
@@ -1035,7 +1036,7 @@ export default {
         }
       );
 
-      /*
+      /!*
       const replyChannel = window.Echo.channel('reply-channel');
       replyChannel.listen('.App\\Events\\ChildCommentCreatedEvent',
         function (data) {
@@ -1055,8 +1056,8 @@ export default {
         }
         );
 
-      */
-/*
+      *!/
+/!*
       const reactChannel = window.Echo.channel('react-channel');
       reactChannel.listen('.App\\Events\\CommentReactionEvent',
         function (data) {
@@ -1089,9 +1090,9 @@ export default {
               });
             }
           });
-      */
+      *!/
 
-    },
+    },*/
 
     // ############## END WEB SOCKETS END #####################//
   },
@@ -1101,9 +1102,9 @@ export default {
   },
 
   mounted() {
-     this.pushEcho()
+    this.pusherData()
     if (process.env.API.PROD){
-     // this.pusherData()
+      this.pusherData()
     }
 
   },

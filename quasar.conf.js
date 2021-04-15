@@ -56,7 +56,8 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API:API_PRODUCTION,
+        API:API_DOCKER,
+        // API:API_PRODUCTION
         VIDEO:API_VIDEO,
         GOOGLE:{
           KEY:GOOGLE_API_KEY,
@@ -121,6 +122,7 @@ module.exports = configure(function (/* ctx */) {
       // For special cases outside of where "auto" importStrategy can have an impact
       // (like functional components as one of the examples),
       // you can manually specify Quasar components/directives to be available everywhere:
+      //
        components: [
          'QChatMessage',
          'QCollapsible'
