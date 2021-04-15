@@ -1,22 +1,18 @@
-# Quasar App (atm)
+## About Deja-Vu
 
-a progressive web app based on vue with a firebase / laravel backend
-
-## Install the dependencies
-```bash
-npm install
-```
-
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
+Deja-Vu is the frontend build in vue.js
+Pixelate is the back-end build on Laravel
 
 
-### Build the app for production
-```bash
-quasar build
-```
+This is my attempt to build a microservice  application based on laravel and vue js.
+To try out this application, check the link below.
+- [Pixelate backend api](https://atemkeng.com/).
+- [Pixelate frontend app: Deja-Vu](https://dejavu.atmkng.de/#/).
+- [Pixelate github repo](https://github.com/Atemndobs/pixelate).
 
-### Customize the configuration
-See [Configuring quasar.conf.js](https://quasar.dev/quasar-cli/quasar-conf-js).
+To install, clone this repository, cd into it and from root folder, run the following commands
+
+## Quick Installation :
+    - `npm install`
+    - `quasar dev`
+
