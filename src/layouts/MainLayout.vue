@@ -6,7 +6,7 @@
       class="bg-white text-grey-10">
       <q-toolbar class="constrain">
 
-        <q-btn
+<!--        <q-btn
           class="large-screen-only q-mr-sm"
           to="/camera"
           icon="eva-camera-outline"
@@ -14,27 +14,93 @@
           text-color="black"
           size="18px"
           dense
-        />
-
-        <q-btn
-          to="/weather/forecast"
-          icon="eva-sun-outline"
-          round
-          text-color="black"
-          size="13px"
-          dense
           flat
-        />
+        />-->
 
-        <q-btn
-          to="/price"
-          icon="eva-bell-outline"
-          round
-          text-color="black"
-          size="13px"
-          dense
-          flat
-        />
+        <q-item :offset="fabPos" :disable="draggingFab">
+          <q-fab
+            icon="menu"
+            direction="down"
+            text-color="black"
+            flat
+            padding="xs"
+            color="black"
+
+          >
+            <div>
+
+              <q-btn
+                to="/weather/forecast"
+                icon="eva-sun"
+                round
+                :size="iconSize"
+                dense
+                flat
+                color="black"
+                :style="menuButtonColor"
+              />
+              <q-btn
+                to="/price"
+                icon="eva-bell-outline"
+                round
+                text-color="black"
+                size="13px"
+                dense
+                flat
+                :style="menuButtonColor"
+              />
+              <q-btn
+                class="q-mr-sm"
+                to="/settings"
+                icon="settings"
+                round
+                text-color="black"
+                size="15px"
+                dense
+                flat
+                :style="menuButtonColor"
+                v-show="this.$auth.check() && this.$auth.user().role === 1"
+              />
+              <q-btn
+                to="/video"
+                icon="eva-video-outline"
+                round
+                text-color="black"
+                size="13px"
+                dense
+                flat
+                :style="menuButtonColor"
+              />
+              <q-btn
+                to="/stream"
+                icon="eva-tv"
+                round
+                text-color="black"
+                size="13px"
+                dense
+                flat
+                :style="menuButtonColor"
+              />
+              <q-btn
+                to="/audio"
+                icon="eva-headphones-outline"
+                round
+                text-color="black"
+                size="13px"
+                dense
+                flat
+                :style="menuButtonColor"
+              />
+              <q-separator
+                class="large-screen-only"
+                vertical
+                spaced
+              />
+
+            </div>
+          </q-fab>
+        </q-item>
+
        <q-separator
           class="large-screen-only"
           vertical
@@ -42,116 +108,86 @@
         />
         <q-toolbar-title
           class="text-grand-hotel text-capitalise text-bold "
+         @click="goHome"
+          style="position: center"
         >
           DejaVu
         </q-toolbar-title>
-        <q-btn
-          class="q-mr-sm"
-          to="/settings"
-          icon="settings"
-          round
-          text-color="black"
-          size="15px"
-          dense
-          flat
-          v-show="this.$auth.check() && this.$auth.user().role === 1"
-        />
 
-        <q-btn
-          to="/video"
-          icon="eva-video-outline"
-          round
-          text-color="black"
-          size="13px"
-          dense
-          flat
-        />
-        <q-btn
-          to="/stream"
-          icon="eva-tv"
-          round
-          text-color="black"
-          size="13px"
-          dense
-          flat
-        />
-
-        <q-btn
-          to="/audio"
-          icon="eva-headphones-outline"
-          round
-          text-color="black"
-          size="13px"
-          dense
-          flat
-        />
-        <q-separator
-          class="large-screen-only"
-          vertical
-          spaced
-        />
-        <q-btn
-          class="large-screen-only"
-          to="/"
-          icon="eva-home-outline"
-          round
-          text-color="black"
-          size="18px"
-          dense
-        />
-        <q-separator
-          class="large-screen-only"
-          vertical
-          spaced
-        />
-        <q-item
-          v-if="!this.$auth.check()"
-          class="large-screen-only"
-        >
+        <q-item v-if="!this.$auth.check()">
           <q-item-section >
             <q-btn
-              class="q-mr-sm"
               to="/login"
               icon="login"
               round
               text-color="black"
-              size="18px"
+              :size="iconSize"
               dense
             />
           </q-item-section>
-
         </q-item >
 
         <q-item
           v-else
+          icon="menu"
+          direction="left"
+          text-color="black"
+          flat
+          padding="xs"
         >
-          <q-item-section  >
-            <q-btn
-              class="large-screen-only"
-              to="/account/home"
-              icon="person"
-              text-color="black"
-              size="18px"
-              rounded
-              dense
-            />
-          </q-item-section>
-          <q-item-section >
-            <q-btn
-              class="large-screen-only q-mr-sm"
-              to="/logout"
-              icon="power_settings_new"
-              round
-              text-color="black"
-              size="18px"
-              dense
-            />
-          </q-item-section>
+          <q-btn external-label label-position="left"
+                 to="/camera"
+                 icon="eva-camera-outline"
+                 text-color="black"
+                 :size="iconSize"
+                 rounded
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+          />
+          <q-btn external-label label-position="left"
+                 to="/account/home"
+                 icon="person"
+                 text-color="black"
+                 :size="iconSize"
+                 rounded
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+          />
+          <q-btn external-label label-position="left"
+                 to="/logout"
+                 icon="logout"
+                 round
+                 text-color="black"
+                 :size="iconSize"
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+          />
+          <q-btn external-label label-position="left"
+                 to="/settings"
+                 icon="settings"
+                 round
+                 text-color="black"
+                 :size="iconSize"
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+                 v-show="this.$auth.check() && this.$auth.user().role === 1"
+          />
         </q-item>
       </q-toolbar>
+
     </q-header>
-
-
     <q-footer
       class="bg-white "
       bordered
@@ -227,79 +263,10 @@
           />
         </q-tabs>
     </q-footer>
-
     <q-page-container class="bg-grey-1">
       <router-view />
     </q-page-container>
-    <q-page-sticky
-      :offset="fabPos"
-      :disable="draggingFab"
-      v-touch-pan.prevent.mouse="moveFab"
-      position="top-right"
-    >
-      <q-item
-        v-if="!this.$auth.check()"
-      >
-        <q-item-section >
-          <q-btn
-            to="/login"
-            icon="login"
-            round
-            text-color="black"
-            size="13px"
-            dense
-          />
-        </q-item-section>
 
-      </q-item >
-      <q-item v-else
-              :offset="fabPos"
-              :disable="draggingFab"
-      >
-        <q-fab
-          icon="menu"
-          direction="left"
-          text-color="black"
-          glossy
-          padding="xs"
-        >
-          <q-fab-action external-label label-position="left"
-              to="/account/home"
-              icon="person"
-              text-color="black"
-              size="18px"
-              rounded
-              dense
-              color="amber-1"
-              label=""
-              padding="xs"
-            />
-          <q-fab-action external-label label-position="left"
-              to="/logout"
-              icon="power_settings_new"
-              round
-              text-color="black"
-              size="18px"
-              dense
-              color="amber-1"
-              label=""
-              padding="xs"
-            />
-          <q-fab-action external-label label-position="left"
-                        to="/settings"
-                        icon="settings"
-                        round
-                        text-color="black"
-                        size="18px"
-                        dense
-                        color="amber-1"
-                        label=""
-                        padding="xs"
-                        v-show="this.$auth.check() && this.$auth.user().role === 1"
-          />
-        </q-fab>
-      </q-item>
-    </q-page-sticky>
   </q-layout>
 
 </template>
@@ -320,7 +287,9 @@ export default {
       showAppInstallBanner: false,
       fabPos: [ 18, 18 ],
       draggingFab: false,
-      query:''
+      query:'',
+      iconSize:'13px',
+      menuButtonColor:'background: antiquewhite'
     }
   },
   mounted() {
@@ -340,7 +309,7 @@ export default {
     }
 
     this.pushEcho()
-  //  this.getForecast()
+  // this.getForecast()
   },
   methods: {
     installApp() {
@@ -557,6 +526,13 @@ export default {
       )
 
     },
+
+    goHome(){
+      if (this.$route.fullPath === '/'){
+        return
+      }
+      this.$router.push('/')
+    }
   },
   computed: {
     toggleDark: {

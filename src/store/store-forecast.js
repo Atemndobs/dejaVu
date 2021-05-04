@@ -7,9 +7,7 @@ const state = {
 }
 
   const actions = {
-  async get({
-    commit
-  }) {
+  async get({ commit}) {
     await axios.get(process.env.API)
       .then((res) => {
         if (res.status === 200) {

@@ -26,7 +26,7 @@ import axios from "axios";
 
 export default {
   name: "AvatarUpload",
-  props:['avatar'],
+
   data: function () {
     return {
       myFiles: [""] ,
