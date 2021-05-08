@@ -5,27 +5,28 @@
       bordered
       class="bg-white text-grey-10">
       <q-toolbar class="constrain">
+        <q-item :offset="fabPos" :disable="draggingFab">
+          <q-fab
+            icon="menu"
+            direction="down"
+            text-color="black"
+            flat
+            padding="xs"
+            color="black"
 
-        <q-btn
-          class="large-screen-only q-mr-sm"
-          to="/camera"
-          icon="eva-camera-outline"
-          round
-          text-color="black"
-          size="18px"
-          dense
-        />
+          >
+            <div>
 
         <q-btn
           to="/weather/forecast"
-          icon="eva-sun-outline"
+                icon="eva-sun"
           round
-          text-color="black"
-          size="13px"
+                :size="iconSize"
           dense
           flat
+                color="black"
+                :style="menuButtonColor"
         />
-
         <q-btn
           to="/price"
           icon="eva-bell-outline"
@@ -34,17 +35,8 @@
           size="13px"
           dense
           flat
+                :style="menuButtonColor"
         />
-       <q-separator
-          class="large-screen-only"
-          vertical
-          spaced
-        />
-        <q-toolbar-title
-          class="text-grand-hotel text-capitalise text-bold "
-        >
-          DejaVu
-        </q-toolbar-title>
         <q-btn
           class="q-mr-sm"
           to="/settings"
@@ -54,9 +46,9 @@
           size="15px"
           dense
           flat
+                :style="menuButtonColor"
           v-show="this.$auth.check() && this.$auth.user().role === 1"
         />
-
         <q-btn
           to="/video"
           icon="eva-video-outline"
@@ -65,6 +57,7 @@
           size="13px"
           dense
           flat
+                :style="menuButtonColor"
         />
         <q-btn
           to="/stream"
@@ -74,8 +67,8 @@
           size="13px"
           dense
           flat
+                :style="menuButtonColor"
         />
-
         <q-btn
           to="/audio"
           icon="eva-headphones-outline"
@@ -84,79 +77,109 @@
           size="13px"
           dense
           flat
+                :style="menuButtonColor"
         />
         <q-separator
           class="large-screen-only"
           vertical
           spaced
         />
-        <q-btn
-          class="large-screen-only"
-          to="/"
-          icon="eva-home-outline"
-          round
-          text-color="black"
-          size="18px"
-          dense
-        />
+
+            </div>
+          </q-fab>
+        </q-item>
+
         <q-separator
           class="large-screen-only"
           vertical
           spaced
         />
-        <q-item
-          v-if="!this.$auth.check()"
-          class="large-screen-only"
+        <q-toolbar-title
+          class="text-grand-hotel text-capitalise text-bold "
+         @click="goHome"
+          style="position: center"
         >
+          DejaVu
+        </q-toolbar-title>
+
+        <q-item v-if="!this.$auth.check()">
           <q-item-section >
             <q-btn
-              class="q-mr-sm"
               to="/login"
               icon="login"
               round
               text-color="black"
-              size="18px"
+              :size="iconSize"
               dense
             />
           </q-item-section>
-
         </q-item >
 
         <q-item
           v-else
+          icon="menu"
+          direction="left"
+          text-color="black"
+          flat
+          padding="xs"
         >
-          <q-item-section  >
-            <q-btn
-              class="large-screen-only"
+          <q-btn external-label label-position="left"
+                 to="/camera"
+                 icon="eva-camera-outline"
+                 text-color="black"
+                 :size="iconSize"
+                 rounded
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+          />
+          <q-btn external-label label-position="left"
               to="/account/home"
               icon="person"
               text-color="black"
-              size="18px"
+                 :size="iconSize"
               rounded
               dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
             />
-          </q-item-section>
-          <q-item-section >
-            <q-btn
-              class="large-screen-only q-mr-sm"
+          <q-btn external-label label-position="left"
               to="/logout"
-              icon="power_settings_new"
+                 icon="logout"
               round
               text-color="black"
-              size="18px"
+                 :size="iconSize"
               dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
             />
-          </q-item-section>
+          <q-btn external-label label-position="left"
+                 to="/settings"
+                 icon="settings"
+                 round
+                 text-color="black"
+                 :size="iconSize"
+                 dense
+                 color="amber-1"
+                 label=""
+                 padding="xs"
+                 flat
+                 v-show="this.$auth.check() && this.$auth.user().role === 1"
+          />
         </q-item>
       </q-toolbar>
+
     </q-header>
-
-
     <q-footer
       class="bg-white "
       bordered
       >
-
       <transition
         appear
         enter-active-class="animated fadeIn"
@@ -226,104 +249,85 @@
             icon="eva-camera-outline"
           />
         </q-tabs>
-    </q-footer>
 
+      <template>
+        <footer>
+          <cookie-law
+            v-on:accept="CookieSettingsPopup"
+            v-on:decline="declineSettings"
+            v-on:close="CookieSettingsPopup"
+            theme="dark-lime"
+            style="color: wheat"
+            class="bg-teal"
+            transitionName="fade"
+            :buttonDecline=true
+            buttonDeclineClass="bg-blue  text-white"
+            buttonDeclineText="Decline"
+            storageType="localStorage"
+            storageName="cookie:accepted"
+            buttonClass="Cookie__button"
+            :buttonLinkNewTab=true
+            buttonLinkText="Private Policy"
+            buttonText="Got it !"
+            buttonLink="/#/privacy"
+            message="🍪 DejaVu uses cookies to ensure you get the best experience on our website. "
+
+          >
+            <div slot="message" class="q-banner--top-padding q-px-lg ">
+              🍪 DejaVu uses cookies to ensure you get the best experience on our website.
+              <p>
+<!--                For more details, read our-->
+<!--                <router-link to="privacy">Privacy Policy</router-link>-->
+<!--                <q-btn to="privacy" flat>Privacy Policy</q-btn>-->
+              </p>
+            </div>
+
+
+          </cookie-law>
+        </footer>
+      </template>
+    </q-footer>
     <q-page-container class="bg-grey-1">
       <router-view />
     </q-page-container>
-    <q-page-sticky
-      :offset="fabPos"
-      :disable="draggingFab"
-      v-touch-pan.prevent.mouse="moveFab"
-      position="top-right"
-    >
-      <q-item
-        v-if="!this.$auth.check()"
-      >
-        <q-item-section >
-          <q-btn
-            to="/login"
-            icon="login"
-            round
-            text-color="black"
-            size="13px"
-            dense
-          />
-        </q-item-section>
-
-      </q-item >
-      <q-item v-else
-              :offset="fabPos"
-              :disable="draggingFab"
-      >
-        <q-fab
-          icon="menu"
-          direction="left"
-          text-color="black"
-          glossy
-          padding="xs"
-        >
-          <q-fab-action external-label label-position="left"
-              to="/account/home"
-              icon="person"
-              text-color="black"
-              size="18px"
-              rounded
-              dense
-              color="amber-1"
-              label=""
-              padding="xs"
-            />
-          <q-fab-action external-label label-position="left"
-              to="/logout"
-              icon="power_settings_new"
-              round
-              text-color="black"
-              size="18px"
-              dense
-              color="amber-1"
-              label=""
-              padding="xs"
-            />
-          <q-fab-action external-label label-position="left"
-                        to="/settings"
-                        icon="settings"
-                        round
-                        text-color="black"
-                        size="18px"
-                        dense
-                        color="amber-1"
-                        label=""
-                        padding="xs"
-                        v-show="this.$auth.check() && this.$auth.user().role === 1"
-          />
-        </q-fab>
-      </q-item>
-    </q-page-sticky>
   </q-layout>
 
 </template>
 
 <script >
 import axios from "axios";
-
 let deferredPrompt;
-
 window.Pusher = require('pusher-js');
-
 import Echo from 'laravel-echo'
+
+import CookieLaw from 'vue-cookie-law'
+import Vue from 'vue'
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
+
+
+
 export default {
   name: 'MainLayout',
+  components : {
+    CookieLaw
+  },
   data() {
     return {
       loggedInUser:'atem',
       showAppInstallBanner: false,
       fabPos: [ 18, 18 ],
       draggingFab: false,
-      query:''
+      query:'',
+      iconSize:'13px',
+      menuButtonColor:'background: antiquewhite',
+      cookieBanner:true,
+      cookieSettings:false,
+      decline:true
     }
   },
   mounted() {
+
     let neverShowAppInstall = this.$q.localStorage.getItem('neverShowAppInstall')
     if (!neverShowAppInstall) {
       window.addEventListener('beforeinstallprompt', (e) => {
@@ -339,10 +343,22 @@ export default {
       });
     }
 
-   // this.pushEcho()
-    this.pusherData()
+    this.pushEcho()
+  // this.getForecast()
   },
+
   methods: {
+    showBanner(){
+      this.cookieBanner = false
+    },
+    CookieSettingsPopup(){
+      console.log('SHOW STICKY COOKIE SETTINGS')
+      this.cookieSettings = true
+      //localStorage.removeItem('cookie:accepted')
+    },
+    declineSettings(){
+      localStorage.removeItem('cookie:accepted')
+    },
     installApp() {
       // Hide the app provided install promotion
       this.showAppInstallBanner = false;
@@ -471,7 +487,7 @@ export default {
       this.showNotif(message, 'teal')
     },
 
-/*    pushEcho(){
+    pushEcho(){
       window.Echo = new Echo({
         broadcaster: 'pusher',
         key: 'local',
@@ -520,7 +536,7 @@ export default {
         }
       );
 
-    },*/
+    },
     pusherData() {
       const pusher = new Pusher(process.env.PUSHER.KEY, {
         cluster: 'eu'
@@ -549,14 +565,6 @@ export default {
         }
       )
 
-
-      const dailyForecastChannel = pusher.subscribe('dailyForecast-channel');
-      dailyForecastChannel.bind('App\\Events\\DailyForecastEvent',
-        function (data){
-          self.livePeakForecast(data)
-        }
-      )
-
       const priceChannel = pusher.subscribe('price-channel');
       priceChannel.bind('App\\Events\\PriceCheckEvent',
         function (data){
@@ -565,6 +573,13 @@ export default {
       )
 
     },
+
+    goHome(){
+      if (this.$route.fullPath === '/'){
+        return
+      }
+      this.$router.push('/')
+    }
   },
   computed: {
     toggleDark: {

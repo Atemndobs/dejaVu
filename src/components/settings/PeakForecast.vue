@@ -9,6 +9,16 @@
       <q-tooltip content-class="bg-accent">This Is going to generate forecast for thr next 24hours (Hourly) </q-tooltip>
     </q-btn>
     <q-input outlined v-model="query" label="City" @keypress.enter="getPeakForecast"/>
+
+    <q-banner class="bg-grey-3">
+      <template v-slot:avatar>
+        <q-icon name="eva-umbrella-outline" color="primary" />
+      </template>
+      {{peakBanner}}
+      <template v-slot:action>
+        <q-btn flat color="primary" :label="temp" />
+      </template>
+    </q-banner>
   </div>
 </template>
 
@@ -31,7 +41,9 @@ export default {
       query:'',
       loading3: false,
       percentage3: 0,
-      city:''
+      city:'',
+      peakBanner:'Display Peak daily forecast',
+      temp:'...'
     }
   },
   methods: {
@@ -47,6 +59,10 @@ export default {
             this.$store.commit('forecasts/setDusseldorf',  {...response.data.data.peak})
           }
           let message = `The warmest time of the day : ${time}  in ${city} with temperature :  ${temp} °C `
+
+          this.peakBanner = message
+          this.temp = temp+'°C'
+          this.query = city
 
           this.showNotif(message, 'positive')
           this.color = 'green'

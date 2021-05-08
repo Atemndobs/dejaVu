@@ -102,23 +102,10 @@
                         <!---------Like Section End ------------->
 
                       </q-item>
-                      <!---------Click to activate Input Start------------->
-                      <q-btn
-                        v-show="$auth.check()"
-                        color="grey-1"
-                        text-color="black"
-                        size="10px"
-                        label="Add comment"
-                        icon="eva-plus-circle-outline"
-                        dense
-                        @click="activateParentComment"
-                      />
-                      <!---------Click to activate Input End------------->
+
 
                       <!---------Comment Input Section ------------->
                       <q-input
-                        v-show="$auth.check()"
-                        v-if="activateAddComment"
                         label="Add comment"
                         v-model="commentBox[index]"
                         class="col col-sm-6"
@@ -995,7 +982,7 @@ export default {
       );*/
     },
 
-/*    pushEcho(){
+    pushEcho(){
       window.Echo = new Echo({
         broadcaster: 'pusher',
         key: 'local',
@@ -1036,7 +1023,7 @@ export default {
         }
       );
 
-      /!*
+      /*
       const replyChannel = window.Echo.channel('reply-channel');
       replyChannel.listen('.App\\Events\\ChildCommentCreatedEvent',
         function (data) {
@@ -1056,8 +1043,8 @@ export default {
         }
         );
 
-      *!/
-/!*
+      */
+/*
       const reactChannel = window.Echo.channel('react-channel');
       reactChannel.listen('.App\\Events\\CommentReactionEvent',
         function (data) {
@@ -1090,9 +1077,9 @@ export default {
               });
             }
           });
-      *!/
+      */
 
-    },*/
+    },
 
     // ############## END WEB SOCKETS END #####################//
   },
@@ -1102,7 +1089,7 @@ export default {
   },
 
   mounted() {
-    this.pusherData()
+    this.pushEcho()
     if (process.env.API.PROD){
       this.pusherData()
     }
