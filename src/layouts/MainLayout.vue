@@ -19,15 +19,15 @@
 
         <q-btn
           to="/weather/forecast"
-                icon="eva-sun"
+          icon="eva-sun"
           round
-                :size="iconSize"
+          :size="iconSize"
           dense
           flat
-                color="black"
-                :style="menuButtonColor"
+          color="black"
+          :style="menuButtonColor"
         />
-        <q-btn
+<!--        <q-btn
           to="/price"
           icon="eva-bell-outline"
           round
@@ -35,8 +35,8 @@
           size="13px"
           dense
           flat
-                :style="menuButtonColor"
-        />
+          :style="menuButtonColor"
+        />-->
         <q-btn
           class="q-mr-sm"
           to="/settings"
@@ -49,7 +49,7 @@
                 :style="menuButtonColor"
           v-show="this.$auth.check() && this.$auth.user().role === 1"
         />
-        <q-btn
+<!--        <q-btn
           to="/video"
           icon="eva-video-outline"
           round
@@ -78,7 +78,7 @@
           dense
           flat
                 :style="menuButtonColor"
-        />
+        />-->
         <q-separator
           class="large-screen-only"
           vertical
@@ -88,20 +88,22 @@
             </div>
           </q-fab>
         </q-item>
-
         <q-separator
           class="large-screen-only"
           vertical
-          spaced
+          spaced="1px"
         />
+
+        <q-space />
         <q-toolbar-title
-          class="text-grand-hotel text-capitalise text-bold "
+          class="text-grand-hotel text-capitalise text-bold content-center"
          @click="goHome"
-          style="position: center"
+
         >
           DejaVu
         </q-toolbar-title>
 
+        <q-space />
         <q-item v-if="!this.$auth.check()">
           <q-item-section >
             <q-btn
@@ -243,7 +245,7 @@
             to="/"
             icon="eva-home-outline"
           />
-
+          <q-space />
           <q-route-tab
             to="/camera"
             icon="eva-camera-outline"
@@ -258,7 +260,7 @@
             v-on:close="CookieSettingsPopup"
             theme="dark-lime"
             style="color: wheat"
-            class="bg-teal"
+            class="bg-teal-9"
             transitionName="fade"
             :buttonDecline=true
             buttonDeclineClass="bg-blue  text-white"
@@ -271,7 +273,6 @@
             buttonText="Got it !"
             buttonLink="/#/privacy"
             message="🍪 DejaVu uses cookies to ensure you get the best experience on our website. "
-
           >
             <div slot="message" class="q-banner--top-padding q-px-lg ">
               🍪 DejaVu uses cookies to ensure you get the best experience on our website.
