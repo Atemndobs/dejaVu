@@ -13,9 +13,9 @@ const { configure } = require('quasar/wrappers');
  API_VALET = 'https://pixelate.app/api'
  API_VIDEO = 'http://localhost:8012/api/v1/'
  API_USERS = 'http://localhost:8011/api/V1/' //double-check the endpoint again
-GOOGLE_API_KEY = 'AIzaSyAMmXVxuzlGe0c0g7HsX24kLAORxwbF88A'
+GOOGLE_API_KEY = 'YOUR_GOOGLE_API_KEY'
 GOOGLE_API_LIBS = 'places,drawing,visualization'
-PUSHER_KEY = '8643c99a8b00ff38c513'
+PUSHER_KEY = 'YOUR_PUSHER_KEY'
 
 module.exports = configure(function (/* ctx */) {
   return {
@@ -56,8 +56,7 @@ module.exports = configure(function (/* ctx */) {
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
       env: {
-        API:API_DOCKER,
-        // API:API_PRODUCTION
+        API:API_PRODUCTION,
         VIDEO:API_VIDEO,
         GOOGLE:{
           KEY:GOOGLE_API_KEY,

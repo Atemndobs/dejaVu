@@ -94,7 +94,7 @@
           spaced="1px"
         />
 
-        <q-space />
+        <q-space class="large-screen-only"/>
         <q-toolbar-title
           class="text-grand-hotel text-capitalise text-bold content-center"
          @click="goHome"
@@ -103,7 +103,7 @@
           DejaVu
         </q-toolbar-title>
 
-        <q-space />
+        <q-space class="large-screen-only"/>
         <q-item v-if="!this.$auth.check()">
           <q-item-section >
             <q-btn
@@ -344,8 +344,10 @@ export default {
       });
     }
 
-    this.pushEcho()
-  // this.getForecast()
+   // this.pushEcho()
+    if (process.env.API.PROD){
+     // this.pusherData()
+    }
   },
 
   methods: {

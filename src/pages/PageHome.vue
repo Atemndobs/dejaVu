@@ -1089,7 +1089,7 @@ export default {
   },
 
   mounted() {
-    this.pushEcho()
+    this.pusherData()
     if (process.env.API.PROD){
       this.pusherData()
     }

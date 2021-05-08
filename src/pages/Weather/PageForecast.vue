@@ -77,7 +77,6 @@ export default {
       await axios.get(apiUrl)
         .then(response => {
           let temp = response.data.data.peak_temperature
-
           this.$store.commit('forecasts/setDusseldorf', {peak:temp})
         }).catch(error => {
         let message = `Please enter a valid City not ${city}`
@@ -141,7 +140,7 @@ export default {
    this.fetchWeather()
   },
   created () {
-    this.pollData()
+   // this.pollData()
   },
   beforeDestroy () {
     clearInterval(this.polling)

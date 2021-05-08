@@ -86,7 +86,7 @@ export default {
     },
   },
   mounted() {
-    console.log(JSON.stringify(this.$store.state.forecasts.dusseldorf))
+
   }
 }
 </script>
